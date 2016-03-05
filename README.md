@@ -16,13 +16,13 @@ throughout your outline, or just use <TAB> to open and close levels.
  
 The most frequent shortcut keys you will use are:
 
- <TAB> open or close the current fold
-  zx  close all other folds  
+    TAB open or close the current fold
+    zx close all other folds  
 
 Use :help fold-commands in vim for additional shorcuts.
 
 The fold function consumes blank lines. If you need to separate one
 fold from another, use a single dot or a dash on a line by itself.
 
-Check for updates to VimFlowy at https://rogerkeays.com/vimflowy
+For updates and screenshots, go to https://rogerkeays.com/vimflowy
 
