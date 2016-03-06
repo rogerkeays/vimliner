@@ -10,7 +10,7 @@ on unix, or $HOME/vimfiles/ftdetect/vimflowy.vim on Windows.
 Save your outliner files with a .out extension for VimFlowy to be 
 autodetected. Otherwise, use :set filetype=vimflowy from within vim.
 
-[VimFlowy screenshot](https://rogerkeays.com/ox/webcore/attachments/27730/vimflowy-the-simplest-outliner-for-vim-screenshot.png?width=600&height=350)
+![VimFlowy screenshot](https://rogerkeays.com/ox/webcore/attachments/27730/vimflowy-the-simplest-outliner-for-vim-screenshot.png?width=600&height=350)
 
 The outliner uses an indentation level of 2 white spaces to create 
 new levels. You can use vim's default code folding shortcuts to move
