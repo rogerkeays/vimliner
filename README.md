@@ -20,6 +20,8 @@ The most frequent shortcut keys you will use are:
 
     TAB open or close the current fold
     zx close all other folds  
+    dd to delete a fold (when it is closed)
+    [p to paste it at the current indent level (use with dd to move outlines)
 
 Use :help fold-commands in vim for additional shorcuts.
 
