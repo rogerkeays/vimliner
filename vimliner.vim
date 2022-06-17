@@ -3,7 +3,7 @@
 " folding capabilities with some simple configuration. The result is a fast,
 " powerful outliner using your favourite text editor.
 "
-" Install Vimliner by saving this file to $HOME/.vim/ftdetect/vimliner.vim
+" Install vimliner by saving this file to $HOME/.vim/ftdetect/vimliner.vim
 " on unix, or $HOME/vimfiles/ftdetect/vimliner.vim on Windows.
 "
 " Save your outliner files with a .out extension for Vimliner to be 
@@ -17,6 +17,8 @@
 "
 " <TAB> open or close the current fold
 "   zx  close all other folds  
+"   dd to delete a fold (when it is closed)
+"   [p to paste at the current indent level (use with dd to move outlines)
 "
 " Use :help fold-commands in vim for additional shorcuts.
 " 
