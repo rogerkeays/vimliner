@@ -19,6 +19,8 @@
 "   zx  close all other folds  
 "   dd to delete a fold (when it is closed)
 "   [p to paste at the current indent level (use with dd to move outlines)
+"  C-k  move item up
+"  C-j  move item down
 "
 " Use :help fold-commands in vim for additional shorcuts.
 " 
@@ -48,6 +50,8 @@ autocmd FileType vimliner set linebreak breakindent showbreak=--------------\
 
 "autocmd FileType vimliner hi Folded ctermbg=black ctermfg=yellow
 autocmd FileType vimliner nnoremap <TAB> za
+autocmd FileType vimliner noremap <C-j> ddp
+autocmd FileType vimliner noremap <C-k> ddkP
 
 function! VimlinerFold(lnum)
     if getline(a:lnum) =~? '^$'
