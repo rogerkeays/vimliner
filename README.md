@@ -42,3 +42,9 @@ Release Notes:
 
 License: https://opensource.org/licenses/Apache-2.0
 
+## Related Resources
+
+  * [Vimcash](https://github.com/rogerkeays/vimcash): an accounting system based on *Vimjournal*.
+  * [Vimjournal](https://github.com/rogerkeays/vimjournal): a simple text format for organising large amounts of information.
+  * [More stuff you never knew you wanted](https://rogerkeays.com).
+
