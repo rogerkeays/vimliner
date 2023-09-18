@@ -48,7 +48,7 @@ autocmd FileType vimliner set foldtext=getline(v:foldstart).'\ ›' fillchars=
 autocmd FileType vimliner set shiftwidth=2 expandtab autoindent
 autocmd FileType vimliner set linebreak breakindent showbreak=--------------\ 
 
-"autocmd FileType vimliner hi Folded ctermbg=black ctermfg=yellow
+autocmd FileType vimliner hi Folded ctermbg=NONE ctermfg=NONE
 autocmd FileType vimliner nnoremap <TAB> za
 autocmd FileType vimliner noremap <C-j> ddp
 autocmd FileType vimliner noremap <C-k> ddkP
