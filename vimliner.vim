@@ -70,3 +70,26 @@ function! VimlinerFold(lnum)
     endif
 endfunction
 
+" filter the current file using a regexp and display the results in a separate tab
+" if no regexp is supplied, the last search pattern is used
+function GrepOutlines(regexp, files)
+  execute 'vimgrep /'.a:regexp.'/j '.a:files
+  if !exists("g:vimliner_copened")
+    $tab copen
+    set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
+    let g:vimliner_copened = 1
+
+    " switchbuf=newtab is ignored when there are no splits, so we use :tab explicitely
+    " https://vi.stackexchange.com/questions/6996
+    nnoremap <Enter> :-tab .cc<CR>zx
+  else
+    $tabnext
+    normal 1G
+  endif
+
+  " hide the quickfix metadata
+  syn match metadata /^.*|[0-9]\+ col [0-9]\+| / transparent conceal
+endfunction
+autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
+autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
+
