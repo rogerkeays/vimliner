@@ -92,4 +92,6 @@ function GrepOutlines(regexp, files)
 endfunction
 autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
 autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
+autocmd FileType vimliner command! Actions call GrepOutlines('^\s*>', '*.out')
+autocmd FileType vimliner command! Habits call GrepOutlines('\[every .*\]', '*.out')
 
