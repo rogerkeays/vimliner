@@ -70,10 +70,8 @@ function! VimlinerFold(lnum)
     endif
 endfunction
 
-" filter the current file using a regexp and display the results in a separate tab
-" if no regexp is supplied, the last search pattern is used
-function GrepOutlines(regexp, files)
-  execute 'vimgrep /'.a:regexp.'/j '.a:files
+" opens the quickfix list in a tab with no formatting
+function DisplayQuickfixTab()
   if !exists("g:vimliner_copened")
     $tab copen
     set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
@@ -88,13 +86,41 @@ function GrepOutlines(regexp, files)
   endif
 
   " hide the quickfix metadata
-  syn match metadata /^.*|[0-9]\+ col [0-9]\+| / transparent conceal
+  syn match metadata /^.*|[0-9 col]\+| / transparent conceal
+endfunction
+
+" filter the current file using a regexp and display the results in a separate tab
+" if no regexp is supplied, the last search pattern is used
+function GrepOutlines(regexp, files)
+  execute 'vimgrep /'.a:regexp.'/j '.a:files
+  call DisplayQuickfixTab()
 endfunction
 autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
 autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
 
-" named queries
-autocmd FileType vimliner command! NextActions call GrepOutlines('^\(\s*>.*\n\)\@<!\s*>', '*.out')
-autocmd FileType vimliner command! Actions call GrepOutlines('^\s*>', '*.out')
-autocmd FileType vimliner command! Habits call GrepOutlines('\[every .*\]', '*.out')
+" build a list of next actions by collecting overdue actions and the first action of each list
+function FindNextActions()
+  let actions = []
+  let lnum = 1
+  let bufnr = bufnr()
+  let lastIndent = 0
+  let today = strftime("%Y%m%d", localtime() - 60*60*4) " roll dates at 4am, not midnight
+
+  for line in getline(1, '$')
+    let indent = indent(lnum)
+    let date = matchstr(line, '\(\[\)\@<=\d\+')
+
+    " add overdue items and the first action in each list
+    if (date != "" && date <= today) || (date == "" && match(line, '^\s*>') > -1 && indent > lastIndent)
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': line, 'date': date})
+    endif
+    if line != ""
+      let lastIndent = indent
+    endif
+    let lnum += 1
+  endfor
+  call setqflist(actions, 'r')
+  call DisplayQuickfixTab()
+endfunction
+autocmd FileType vimliner command! Actions call FindNextActions()
 
