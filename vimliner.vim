@@ -112,13 +112,16 @@ function FindNextActions()
 
     " add overdue items and the first action in each list
     if (date != "" && date <= today) || (date == "" && match(line, '^\s*>') > -1 && indent > lastIndent)
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': line, 'date': date})
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': line, 'date': date == "" ? "X" : date })
     endif
     if line != ""
       let lastIndent = indent
     endif
     let lnum += 1
   endfor
+
+  " sort by date, then line number, and display as a quicklist
+  call sort(actions, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
   call setqflist(actions, 'r')
   call DisplayQuickfixTab()
 endfunction
