@@ -101,23 +101,23 @@ autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.
 " build a list of next actions by collecting overdue actions and the first action of each list
 function FindNextActions()
   let actions = []
-  let lnum = 1
+  let lnum = 0
   let bufnr = bufnr()
   let lastIndent = 0
   let today = strftime("%Y%m%d", localtime() - 60*60*4) " roll dates at 4am, not midnight
 
   for line in getline(1, '$')
+    let lnum += 1
     let indent = indent(lnum)
-    let date = matchstr(line, '\(\[\)\@<=\d\+')
+    let date = matchstr(line, '\(\[\)\@<=[^ ]\+')
 
     " add overdue items and the first action in each list
     if (date != "" && date <= today) || (date == "" && match(line, '^\s*>') > -1 && indent > lastIndent)
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': line, 'date': date == "" ? "X" : date })
     endif
-    if line != ""
+    if line != "" && date == ""
       let lastIndent = indent
     endif
-    let lnum += 1
   endfor
 
   " sort by date, then line number, and display as a quicklist
