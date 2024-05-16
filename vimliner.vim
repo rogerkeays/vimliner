@@ -98,8 +98,9 @@ endfunction
 autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
 autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
 
-" build a list of next actions by collecting overdue actions and the first action of each list
+" build a list of next actions by collecting overdue habits and the first action of each list
 function FindNextActions()
+  let habits = []
   let actions = []
   let lnum = 0
   let bufnr = bufnr()
@@ -111,18 +112,20 @@ function FindNextActions()
     let indent = indent(lnum)
     let date = matchstr(line, '\(\[\)\@<=[^ ]\+')
 
-    " add overdue items and the first action in each list
-    if (date != "" && date <= today) || (date == "" && match(line, '^\s*>') > -1 && indent > lastIndent)
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': line, 'date': date == "" ? "X" : date })
+    " collect overdue habits and the first action in each list
+    if date != "" && date <= today
+      call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': line })
+    elseif date == "" && match(line, '^\s*>') > -1 && indent > lastIndent
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': line })
     endif
     if line != "" && date == ""
       let lastIndent = indent
     endif
   endfor
 
-  " sort by date, then line number, and display as a quicklist
-  call sort(actions, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
-  call setqflist(actions, 'r')
+  " arrange and display as a quicklist
+  let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'------------' } ]
+  call setqflist(separator + overdue + separator + actions, 'r')
   call DisplayQuickfixTab()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions()
