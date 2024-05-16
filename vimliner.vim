@@ -79,7 +79,7 @@ function DisplayQuickfixTab()
 
     " switchbuf=newtab is ignored when there are no splits, so we use :tab explicitely
     " https://vi.stackexchange.com/questions/6996
-    nnoremap <Enter> :-tab .cc<CR>zx
+    nnoremap <buffer> <Enter> :-tab .cc<CR>zx
   else
     $tabnext
     normal 1G
