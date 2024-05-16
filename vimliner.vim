@@ -125,7 +125,7 @@ function FindNextActions()
 
   " arrange and display as a quicklist
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'------------' } ]
-  call setqflist(separator + overdue + separator + actions, 'r')
+  call setqflist(separator + habits + separator + actions, 'r')
   call DisplayQuickfixTab()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions()
