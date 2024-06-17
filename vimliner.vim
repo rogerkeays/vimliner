@@ -88,7 +88,7 @@ function DisplayQuickfixTab()
   " hide the quickfix metadata
   syn match metadata /^.*|[0-9 col]\+| / transparent conceal
 endfunction
-autocmd FileType vimjournal hi QuickFixLine ctermbg=None
+autocmd FileType vimliner hi QuickFixLine ctermbg=None
 
 " filter the current file using a regexp and display the results in a separate tab
 " if no regexp is supplied, the last search pattern is used
