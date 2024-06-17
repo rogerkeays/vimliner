@@ -115,7 +115,7 @@ function FindNextActions()
 
     " collect overdue habits and the first action in each list
     if date != "" && date <= today
-      call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': line })
+      call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': line, 'date': date })
     elseif date == "" && match(line, '^\s*>') > -1 && indent > lastIndent
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': line })
     endif
@@ -126,6 +126,7 @@ function FindNextActions()
 
   " arrange and display as a quicklist
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'------------' } ]
+  call sort(habits, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
   call setqflist(separator + habits + separator + actions, 'r')
   call DisplayQuickfixTab()
 endfunction
