@@ -116,8 +116,8 @@ function FindNextActions()
     let splits = line -> split(" : ")
     let action = "" | if splits -> len() > 0 | let action = splits[0] -> trim() | endif
     let date = "" | if splits -> len() > 1 | let date = splits[1] | endif
-    let repeat = "" | if splits -> len() > 2 | let repeat = splits[2] | endif
-    let duration = "" | if splits -> len() > 3 | let duration = splits[3] -> str2nr() | endif
+    let duration = "" | if splits -> len() > 2 | let duration = splits[2] -> str2nr() | endif
+    let repeat = "" | if splits -> len() > 3 | let repeat = splits[3] | endif
 
     " collect overdue habits and the first action in each list
     if date != "" && date <= today
