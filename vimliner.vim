@@ -110,14 +110,21 @@ function FindNextActions()
 
   for line in getline(1, '$')
     let lnum += 1
+
+    " parse each line
     let indent = indent(lnum)
-    let date = matchstr(line, '\(\[\)\@<=[^ ]\+')
+    let splits = line -> split(" : ")
+    let action = "" | if splits -> len() > 0 | let action = splits[0] -> trim() | endif
+    let date = "" | if splits -> len() > 1 | let date = splits[1] | endif
+    let repeat = "" | if splits -> len() > 2 | let repeat = splits[2] | endif
+    let duration = "" | if splits -> len() > 3 | let duration = splits[3] -> str2nr() | endif
 
     " collect overdue habits and the first action in each list
     if date != "" && date <= today
-      call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': line, 'date': date })
+      let text = printf("%s %03d %s", date, duration, action)
+      call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'duration': duration })
     elseif date == "" && match(line, '^\s*>') > -1 && indent > lastIndent
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': line })
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
     endif
     if line != "" && date == ""
       let lastIndent = indent
@@ -126,7 +133,7 @@ function FindNextActions()
 
   " arrange and display as a quicklist
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'------------' } ]
-  call sort(habits, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
+  call sort(habits, { x, y -> x.duration == y.duration ? 0 : x.duration > y.duration ? -1 : 1 })
   call setqflist(separator + habits + separator + actions, 'r')
   call DisplayQuickfixTab()
 endfunction
