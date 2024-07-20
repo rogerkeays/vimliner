@@ -101,13 +101,13 @@ autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.
 
 " build a list of next actions by collecting scheduled actions and the first 
 " unscheduled action of each fold
-function FindNextActions()
+function FindNextActions(date)
   let scheduled = []
   let unscheduled = []
   let lnum = 0
   let bufnr = bufnr()
   let lastIndent = 0
-  let today = strftime("%Y%m%d", localtime() - 60*60*4) " roll dates at 4am, not midnight
+  let today = strftime("%Y%m%d", a:date - 60*60*4) " roll dates at 4am, not midnight
 
   for line in getline(1, '$')
     let lnum += 1
@@ -133,10 +133,11 @@ function FindNextActions()
   endfor
 
   " arrange and display as a quicklist
-  let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'------------' } ]
+  let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
   call sort(scheduled, { x, y -> x.duration == y.duration ? 0 : x.duration > y.duration ? -1 : 1 })
   call setqflist(separator + scheduled + separator + unscheduled, 'r')
   call DisplayQuickfixTab()
 endfunction
-autocmd FileType vimliner command! Actions call FindNextActions()
+autocmd FileType vimliner command! Actions call FindNextActions(localtime())
+autocmd FileType vimliner command! Tomorrow call FindNextActions(localtime() + 24*60*60)
 
