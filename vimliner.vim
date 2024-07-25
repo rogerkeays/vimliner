@@ -99,11 +99,10 @@ endfunction
 autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
 autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
 
-" build a list of next actions by collecting scheduled actions and the first 
-" unscheduled action of each fold
+" build a list of next actions by collecting habits and the first action of each fold
 function FindNextActions(date)
-  let scheduled = []
-  let unscheduled = []
+  let habits = []
+  let actions = []
   let lnum = 0
   let bufnr = bufnr()
   let lastIndent = 0
@@ -120,12 +119,12 @@ function FindNextActions(date)
     let date = "" | if splits -> len() > 2 | let date = splits[2] | endif
     let duration = "" | if splits -> len() > 3 | let duration = splits[3] -> str2nr() | endif
 
-    " collect scheduled actions and the first unscheduled action in each fold
+    " collect habits and the first action in each fold
     if date != "" && date <= today
       let text = printf("%s %03d %s", date, duration, action)
-      call add(scheduled, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'duration': duration })
+      call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'duration': duration })
     elseif date == "" && match(line, '^\s*>') > -1 && indent > lastIndent
-      call add(unscheduled, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
     endif
     if line != "" && date == ""
       let lastIndent = indent
@@ -134,8 +133,8 @@ function FindNextActions(date)
 
   " arrange and display as a quicklist
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
-  call sort(scheduled, { x, y -> x.duration == y.duration ? 0 : x.duration > y.duration ? -1 : 1 })
-  call setqflist(separator + scheduled + separator + unscheduled, 'r')
+  call sort(habits, { x, y -> x.duration == y.duration ? 0 : x.duration > y.duration ? -1 : 1 })
+  call setqflist(separator + habits + separator + actions, 'r')
   call DisplayQuickfixTab()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(localtime())
