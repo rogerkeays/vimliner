@@ -116,9 +116,9 @@ function FindNextActions(date)
     let indent = indent(lnum)
     let splits = line -> split(" : ")
     let action = "" | if splits -> len() > 0 | let action = splits[0] -> trim() | endif
-    let date = "" | if splits -> len() > 1 | let date = splits[1] | endif
-    let duration = "" | if splits -> len() > 2 | let duration = splits[2] -> str2nr() | endif
-    let repeat = "" | if splits -> len() > 3 | let repeat = splits[3] | endif
+    let repeat = "" | if splits -> len() > 1 | let repeat = splits[1] | endif
+    let date = "" | if splits -> len() > 2 | let date = splits[2] | endif
+    let duration = "" | if splits -> len() > 3 | let duration = splits[3] -> str2nr() | endif
 
     " collect scheduled actions and the first unscheduled action in each fold
     if date != "" && date <= today
