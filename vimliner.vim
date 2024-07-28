@@ -101,33 +101,40 @@ autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.
 
 " build a list of next actions by collecting habits and the first action of each fold
 function FindNextActions(date)
+  let goals = []
   let habits = []
   let actions = []
   let lnum = 0
+  let lastDepth = -1
   let bufnr = bufnr()
-  let lastIndent = 0
   let today = strftime("%Y%m%d", a:date - 60*60*4) " roll dates at 4am, not midnight
 
   for line in getline(1, '$')
     let lnum += 1
 
     " parse each line
-    let indent = indent(lnum)
     let splits = line -> split(" : ")
-    let action = "" | if splits -> len() > 0 | let action = splits[0] -> trim() | endif
-    let repeat = "" | if splits -> len() > 1 | let repeat = splits[1] | endif
+    let goal = "" | if splits -> len() > 0 | let goal = splits[0] -> trim() | endif
+    let freq = "" | if splits -> len() > 1 | let freq = splits[1] | endif
     let date = "" | if splits -> len() > 2 | let date = splits[2] | endif
     let duration = "" | if splits -> len() > 3 | let duration = splits[3] -> str2nr() | endif
 
-    " collect habits and the first action in each fold
+    " track goal hierarchy using a stack
+    let depth = indent(lnum) / 2
+    if depth <= lastDepth | call remove(goals, depth - 1, -1) | endif
+    call add(goals, goal)
+    if line != "" | let lastDepth = depth | endif
+
+    " collect due habits
     if date != "" && date <= today
-      let text = printf("%s %03d %s", date, duration, action)
+      let text = printf("%s %03d %s", date, duration, goal)
       call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'duration': duration })
-    elseif date == "" && match(line, '^\s*>') > -1 && indent > lastIndent
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
     endif
-    if line != "" && date == ""
-      let lastIndent = indent
+
+    " collect the first action of each goal
+    if line -> match('^\s*>') > -1 && goals[-2] != ""
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': goal })
+      let goals[-2] = ""
     endif
   endfor
 
