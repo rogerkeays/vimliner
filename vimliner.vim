@@ -102,6 +102,7 @@ autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.
 " build a list of next actions by collecting habits and the first action of each fold
 function FindNextActions(date)
   let goals = []
+  let deadlines = []
   let habits = []
   let actions = []
   let lnum = 0
@@ -125,6 +126,12 @@ function FindNextActions(date)
     call add(goals, goal)
     if line != "" | let lastDepth = depth | endif
 
+    " collect deadlines
+    if freq == "!"
+      let text = printf("%s %s", date, goal)
+      call add(deadlines, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'date': date })
+    endif
+
     " collect due habits
     if date != "" && date <= today
       let text = printf("%s %03d %s", date, duration, goal)
@@ -139,9 +146,11 @@ function FindNextActions(date)
   endfor
 
   " arrange and display as a quicklist
+  let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': today.' TODAY' } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
+  call sort(deadlines, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
   call sort(habits, { x, y -> x.duration == y.duration ? 0 : x.duration > y.duration ? -1 : 1 })
-  call setqflist(separator + habits + separator + actions, 'r')
+  call setqflist(separator + dateline + deadlines + separator + habits + separator + actions, 'r')
   call DisplayQuickfixTab()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(localtime())
