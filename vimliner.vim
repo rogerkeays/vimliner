@@ -44,7 +44,7 @@
 "
 autocmd BufRead,BufNewFile *.out set filetype=vimliner
 autocmd FileType vimliner set foldmethod=expr foldexpr=VimlinerFold(v:lnum)
-autocmd FileType vimliner set foldtext=getline(v:foldstart).'\ ›' fillchars= 
+autocmd FileType vimliner set foldtext=getline(v:foldstart).'\ ›' fillchars=fold:\ 
 autocmd FileType vimliner set shiftwidth=2 expandtab autoindent
 autocmd FileType vimliner set linebreak breakindent showbreak=--------------\ 
 
