@@ -114,11 +114,11 @@ function FindNextActions(date)
     let lnum += 1
 
     " parse each line
-    let splits = line -> split(" : ")
-    let goal = "" | if splits -> len() > 0 | let goal = splits[0] -> trim() | endif
-    let freq = "" | if splits -> len() > 1 | let freq = splits[1] | endif
-    let date = "" | if splits -> len() > 2 | let date = splits[2] | endif
-    let duration = "" | if splits -> len() > 3 | let duration = splits[3] -> str2nr() | endif
+    let splits = line->split(" : ")
+    let goal = "" | if splits->len() > 0 | let goal = splits[0]->trim() | endif
+    let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
+    let date = "" | if splits->len() > 2 | let date = splits[2] | endif
+    let duration = "" | if splits->len() > 3 | let duration = splits[3]->str2nr() | endif
 
     " track goal hierarchy using a stack
     let depth = indent(lnum) / 2
@@ -139,7 +139,7 @@ function FindNextActions(date)
     endif
 
     " collect the first action of each goal
-    if line -> match('^\s*>') > -1 && goals[-2] != ""
+    if line->match('^\s*>') > -1 && goals[-2] != ""
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': goal })
       let goals[-2] = ""
     endif
