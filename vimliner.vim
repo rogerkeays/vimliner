@@ -86,7 +86,7 @@ function DisplayQuickfixTab()
   endif
 
   " hide the quickfix metadata
-  syn match metadata /^.*|[0-9 col]\+| / transparent conceal
+  syn match metadata /^.*|[-0-9 col]\+| / transparent conceal
 endfunction
 autocmd FileType vimliner hi QuickFixLine ctermbg=None
 
