@@ -101,7 +101,7 @@ autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.
 
 " build a list of next actions by collecting habits and the first action of each fold
 function FindNextActions(date)
-  let goals = []
+  let tree = []
   let deadlines = []
   let habits = []
   let actions = []
@@ -122,8 +122,8 @@ function FindNextActions(date)
 
     " track goal hierarchy using a stack
     let depth = indent(lnum) / 2
-    if depth <= lastDepth | call remove(goals, depth - 1, -1) | endif
-    call add(goals, goal)
+    if depth <= lastDepth | call remove(tree, depth - 1, -1) | endif
+    call add(tree, goal)
     if line != "" | let lastDepth = depth | endif
 
     " collect deadlines
@@ -132,16 +132,16 @@ function FindNextActions(date)
       call add(deadlines, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'date': date })
     endif
 
-    " collect due habits
+    " collect habits
     if date != "" && date <= today
       let text = printf("%s %03d %s", date, duration, goal)
       call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'duration': duration })
     endif
 
     " collect the first action of each goal
-    if line->match('^\s*>') > -1 && goals[-2] != ""
+    if line->match('^\s*>') > -1 && tree[-2] != ""
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': goal })
-      let goals[-2] = ""
+      let tree[-2] = ""
     endif
   endfor
 
