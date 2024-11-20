@@ -1,14 +1,10 @@
 # Vimliner: The Simplest Outliner for VIM
 
-Vimliner is the simplest outliner for vim. It uses vim's existing code 
-folding capabilities with some simple configuration. The result is a fast,
-powerful outliner using your favourite text editor.
+Vimliner is the simplest outliner for vim. It uses vim's existing code folding capabilities with some simple configuration. The result is a fast, powerful outliner using your favourite text editor.
 
 ![Vimliner screenshot](https://rogerkeays.com/ox/webcore/attachments/27730/vimliner-the-simplest-outliner-for-vim-screenshot.png?width=600&height=350)
 
-The outliner uses an indentation level of two white spaces to create
-new levels. You can use vim's default code folding shortcuts to move
-throughout your outline, or just use `TAB` to open and close levels.
+The outliner uses an indentation level of two white spaces to create new levels. You can use vim's default code folding shortcuts to move throughout your outline, or just use `TAB` to open and close levels.
  
 The most frequent shortcut keys you will use are:
 
@@ -19,56 +15,41 @@ The most frequent shortcut keys you will use are:
 
 Use `:help fold-commands` in vim for additional shorcuts.
 
-The fold function consumes blank lines. If you need to separate one
-fold from another, use a string of space characters that match the
-current indent level.
+The fold function consumes blank lines. If you need to separate one fold from another, use a string of space characters that match the current indent level.
 
 ## Installation
 
-Install vimliner by saving [`vimliner.vim`][1] to
-`$HOME/.vim/ftdetect/vimliner.vim` on unix, or
-`$HOME/vimfiles/ftdetect/vimliner.vim` on Windows.
+Install vimliner by saving [`vimliner.vim`][1] to `$HOME/.vim/ftdetect/vimliner.vim` on unix, or `$HOME/vimfiles/ftdetect/vimliner.vim` on Windows.
 
 [1]: https://raw.githubusercontent.com/rogerkeays/vimliner/refs/heads/master/vimliner.vim
 
-Save your outliner files with a `.out` extension for vimliner to be
-autodetected. Otherwise, use `:set filetype=vimliner` from within vim.
+Save your outliner files with a `.out` extension for vimliner to be autodetected. Otherwise, use `:set filetype=vimliner` from within vim.
 
 ## Using Vimliner as a Productivity Tool
 
-Since version 1.3, Vimliner includes the query functions below. The query
-results are displayed in a quickfix list in a separate tab, and you can easily
-jump to the matching lines by pressing `Enter`.
+Since version 1.3, Vimliner includes the query functions below. The query results are displayed in a quickfix list in a separate tab, and you can easily jump to the matching lines by pressing `Enter`.
 
  - `:Filter regexp` displays lines matching `regexp` from the current file
- - `:Find regexp` displays lines matching `regexp` from all `.log` files in
-                    the current directory
+ - `:Find regexp` displays lines matching `regexp` from all `.log` files in the current directory
  - `:Actions` show today's list of deadlines, habits and goals
  - `:Tomorrow` show tomorrow's list of deadlines, habits and goals
 
-**Deadlines** are defined by adding a date preceded by an exclamation mark. The
-date format should be `YYYYMMDD`. A semicolon is required with spacing to
-separate the fields. E.g.
+**Deadlines** are defined by adding a date preceded by an exclamation mark. The date format should be `YYYYMMDD`. A semicolon is required with spacing to separate the fields. E.g.
 
     release vimliner 1.3 : !20241120
 
-**Habits** are defined with three extra fields: frequency, date of next
-repetition, and duration. The frequency is any text string; date is as above;
-and the duration is a number in minutes. E.g.
+**Habits** are defined with three extra fields: frequency, date of next repetition, and duration. The frequency is any text string; date is as above; and the duration is a number in minutes. E.g.
 
     cook real food : every day : 20241120 : 45
 
-Habits are sorted longest first. As you complete them, you must update the
-repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
+Habits are sorted longest first. As you complete them, you must update the repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
 
-**Goals** include a countdown field which is either the number of remaining
-tasks, or an `>` arrow, which means *in progress*. E.g.
+**Goals** include a countdown field which is either the number of remaining tasks, or an `>` arrow, which means *in progress*. E.g.
 
     watch the cities of gold : 19
     conquer the world : >
 
-Of course, you can use whatever tags and symbols you like for any purpose and
-query for those entries using `:Filter` and `:Find`.
+Of course, you can use whatever tags and symbols you like for any purpose and query for those entries using `:Filter` and `:Find`.
 
 ## News And Updates
 
