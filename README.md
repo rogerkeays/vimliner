@@ -4,8 +4,7 @@ Vimliner is the simplest outliner for vim. It uses vim's existing code
 folding capabilities with some simple configuration. The result is a fast,
 powerful outliner using your favourite text editor.
 
-![Vimliner screenshot]
-(https://rogerkeays.com/ox/webcore/attachments/27730/vimliner-the-simplest-outliner-for-vim-screenshot.png?width=600&height=350)
+![Vimliner screenshot](https://rogerkeays.com/ox/webcore/attachments/27730/vimliner-the-simplest-outliner-for-vim-screenshot.png?width=600&height=350)
 
 The outliner uses an indentation level of two white spaces to create
 new levels. You can use vim's default code folding shortcuts to move
@@ -26,7 +25,7 @@ current indent level.
 
 ## Installation
 
-Install vimliner by saving `[vimliner.vim][1]` to
+Install vimliner by saving [`vimliner.vim`][1] to
 `$HOME/.vim/ftdetect/vimliner.vim` on unix, or
 `$HOME/vimfiles/ftdetect/vimliner.vim` on Windows.
 
