@@ -12,9 +12,9 @@ autodetected. Otherwise, use `:set filetype=vimliner` from within vim.
 
 ![Vimliner screenshot](https://rogerkeays.com/ox/webcore/attachments/27730/vimliner-the-simplest-outliner-for-vim-screenshot.png?width=600&height=350)
 
-The outliner uses an indentation level of 2 white spaces to create 
+The outliner uses an indentation level of two white spaces to create
 new levels. You can use vim's default code folding shortcuts to move
-throughout your outline, or just use TAB to open and close levels.
+throughout your outline, or just use `TAB` to open and close levels.
  
 The most frequent shortcut keys you will use are:
 
@@ -31,9 +31,9 @@ current indent level.
 
 ## Using Vimliner as a Productivity Tool
 
-Since version 1.3, Vimliner includes the additional query functions below. The
-query results are displayed in a quickfix list in a separate tab, and you can
-easily jump to the matching lines by pressing `Enter`.
+Since version 1.3, Vimliner includes the query functions below. The query
+results are displayed in a quickfix list in a separate tab, and you can easily
+jump to the matching lines by pressing `Enter`.
 
  - `:Filter regexp` displays lines matching `regexp` from the current file
  - `:Find regexp` displays lines matching `regexp` from all `.log` files in
@@ -83,7 +83,7 @@ query for those entries using `:Filter` and `:Find`.
 
 ## Related Resources
 
-  * [Vimcash](https://github.com/rogerkeays/vimcash): an accounting system based on *Vimjournal*.
   * [Vimjournal](https://github.com/rogerkeays/vimjournal): a simple text format for organising large amounts of information.
+  * [Vimcash](https://github.com/rogerkeays/vimcash): an accounting system based on *Vimjournal*.
   * [More stuff you never knew you wanted](https://rogerkeays.com).
 
