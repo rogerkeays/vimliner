@@ -35,6 +35,7 @@
 "
 " Release Notes:
 "
+" 20241120_1.3 - added query functions and productivity features
 " 20200430_1.2 - renamed to vimliner to avoid confusion with rival project
 " 20200424_1.1 - allow lines containing only whitespace
 " 20160305_1.0 - initial release
@@ -70,36 +71,7 @@ function! VimlinerFold(lnum)
     endif
 endfunction
 
-" opens the quickfix list in a tab with no formatting
-function DisplayQuickfixTab()
-  if !exists("g:vimliner_copened")
-    $tab copen
-    set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
-    let g:vimliner_copened = 1
-
-    " switchbuf=newtab is ignored when there are no splits, so we use :tab explicitely
-    " https://vi.stackexchange.com/questions/6996
-    nnoremap <buffer> <Enter> :-tab .cc<CR>zx
-  else
-    $tabnext
-    normal 1G
-  endif
-
-  " hide the quickfix metadata
-  syn match metadata /^.*|[-0-9 col]\+| / transparent conceal
-endfunction
-autocmd FileType vimliner hi QuickFixLine ctermbg=None
-
-" filter the current file using a regexp and display the results in a separate tab
-" if no regexp is supplied, the last search pattern is used
-function GrepOutlines(regexp, files)
-  execute 'vimgrep /'.a:regexp.'/j '.a:files
-  call DisplayQuickfixTab()
-endfunction
-autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
-autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
-
-" build a list of next actions by collecting habits and the first action of each fold
+" build a list of next actions by collecting deadlines, habits and goals
 function FindNextActions(date)
   let deadlines = []
   let habits = []
@@ -147,4 +119,33 @@ function FindNextActions(date)
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(localtime())
 autocmd FileType vimliner command! Tomorrow call FindNextActions(localtime() + 24*60*60)
+
+" filter the current file using a regexp and display the results in a separate tab
+" if no regexp is supplied, the last search pattern is used
+function GrepOutlines(regexp, files)
+  execute 'vimgrep /'.a:regexp.'/j '.a:files
+  call DisplayQuickfixTab()
+endfunction
+autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
+autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
+
+" opens the quickfix list in a tab with no formatting
+function DisplayQuickfixTab()
+  if !exists("g:vimliner_copened")
+    $tab copen
+    set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
+    let g:vimliner_copened = 1
+
+    " switchbuf=newtab is ignored when there are no splits, so we use :tab explicitely
+    " https://vi.stackexchange.com/questions/6996
+    nnoremap <buffer> <Enter> :-tab .cc<CR>zx
+  else
+    $tabnext
+    normal 1G
+  endif
+
+  " hide the quickfix metadata
+  syn match metadata /^.*|[-0-9 col]\+| / transparent conceal
+endfunction
+autocmd FileType vimliner hi QuickFixLine ctermbg=None
 
