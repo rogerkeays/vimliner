@@ -54,6 +54,7 @@ Of course, you can use whatever tags and symbols you like for any purpose and qu
 ## News And Updates
 
  - https://rogerkeays.com/vimliner
+ - https://github.com/rogerkeays/vimliner
  - https://www.vim.org/scripts/script.php?script_id=5343
 
 ## Release Notes
