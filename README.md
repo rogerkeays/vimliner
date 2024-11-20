@@ -41,22 +41,22 @@ jump to the matching lines by pressing `Enter`.
  - `:Actions` show today's list of deadlines, habits and goals
  - `:Tomorrow` show tomorrow's list of deadlines, habits and goals
 
-Deadlines are defined by adding a date preceded by an exclamation mark. The
+**Deadlines** are defined by adding a date preceded by an exclamation mark. The
 date format should be `YYYYMMDD`. A semicolon is required with spacing to
 separate the fields. E.g.
 
     release vimliner 1.3 : !20241120
 
-Habits are defined with three extra fields: frequency, date of next repetition,
-and duration. The frequency is any text string; date is as above; and the
-duration is a number in minutes. E.g.
+**Habits** are defined with three extra fields: frequency, date of next
+repetition, and duration. The frequency is any text string; date is as above;
+and the duration is a number in minutes. E.g.
 
     cook real food : every day : 20241120 : 45
 
 Habits are sorted longest first. As you complete them, you must update the
 repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
 
-Goals include a countdown field which is either the number of remaining
+**Goals** include a countdown field which is either the number of remaining
 tasks, or an `>` arrow, which means *in progress*. E.g.
 
     watch the cities of gold : 19
