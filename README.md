@@ -4,13 +4,8 @@ Vimliner is the simplest outliner for vim. It uses vim's existing code
 folding capabilities with some simple configuration. The result is a fast,
 powerful outliner using your favourite text editor.
 
-Install vimliner by saving `vimliner.vim` to `$HOME/.vim/ftdetect/vimliner.vim`
-on unix, or `$HOME/vimfiles/ftdetect/vimliner.vim` on Windows.
-
-Save your outliner files with a `.out` extension for vimliner to be 
-autodetected. Otherwise, use `:set filetype=vimliner` from within vim.
-
-![Vimliner screenshot](https://rogerkeays.com/ox/webcore/attachments/27730/vimliner-the-simplest-outliner-for-vim-screenshot.png?width=600&height=350)
+![Vimliner screenshot]
+(https://rogerkeays.com/ox/webcore/attachments/27730/vimliner-the-simplest-outliner-for-vim-screenshot.png?width=600&height=350)
 
 The outliner uses an indentation level of two white spaces to create
 new levels. You can use vim's default code folding shortcuts to move
@@ -28,6 +23,17 @@ Use `:help fold-commands` in vim for additional shorcuts.
 The fold function consumes blank lines. If you need to separate one
 fold from another, use a string of space characters that match the
 current indent level.
+
+## Installation
+
+Install vimliner by saving `[vimliner.vim][1]` to
+`$HOME/.vim/ftdetect/vimliner.vim` on unix, or
+`$HOME/vimfiles/ftdetect/vimliner.vim` on Windows.
+
+[1]: https://raw.githubusercontent.com/rogerkeays/vimliner/refs/heads/master/vimliner.vim
+
+Save your outliner files with a `.out` extension for vimliner to be
+autodetected. Otherwise, use `:set filetype=vimliner` from within vim.
 
 ## Using Vimliner as a Productivity Tool
 
