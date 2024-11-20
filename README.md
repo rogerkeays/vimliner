@@ -33,13 +33,13 @@ current indent level.
 
 Since version 1.3, Vimliner includes the additional query functions below. The
 query results are displayed in a quickfix list in a separate tab, and you can
-easily jump to the matching lines by pressing `<Enter>`.
+easily jump to the matching lines by pressing `Enter`.
 
- - `:Filter regexp` : displays lines matching `regexp` from the current file
- - `:Find regexp` : displays lines matching `regexp` from all `.log` files in
+ - `:Filter regexp` displays lines matching `regexp` from the current file
+ - `:Find regexp` displays lines matching `regexp` from all `.log` files in
                     the current directory
- - `:Actions` : show today's list of deadlines, habits and goals
- - `:Tomorrow` : show tomorrow's list of deadlines, habits and goals
+ - `:Actions` show today's list of deadlines, habits and goals
+ - `:Tomorrow` show tomorrow's list of deadlines, habits and goals
 
 Deadlines are defined by adding a date preceded by an exclamation mark. The
 date format should be `YYYYMMDD`. A semicolon is required with spacing to
@@ -72,7 +72,7 @@ query for those entries using `:Filter` and `:Find`.
 
 ## Release Notes
 
- - 20241120_1.3 - added query functions and deadlines/habits/goals productivity features
+ - 20241120_1.3 - added query functions and productivity features
  - 20200430_1.2 - renamed to vimliner to avoid confusion with rival project
  - 20200424_1.1 - allow lines containing only whitespace
  - 20160305_1.0 - initial release
