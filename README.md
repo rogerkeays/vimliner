@@ -29,18 +29,20 @@ The fold function consumes blank lines. If you need to separate one
 fold from another, use a string of space characters that match the
 current indent level.
 
-News And Updates:
+## News And Updates
 
  - https://rogerkeays.com/vimliner
  - https://www.vim.org/scripts/script.php?script_id=5343
 
-Release Notes:
+## Release Notes
 
  - 20200430_1.2 - renamed to vimliner to avoid confusion with rival project
  - 20200424_1.1 - allow lines containing only whitespace
  - 20160305_1.0 - initial release
 
-License: https://opensource.org/licenses/Apache-2.0
+## License
+
+ - https://opensource.org/licenses/Apache-2.0
 
 ## Related Resources
 
