@@ -101,47 +101,39 @@ autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.
 
 " build a list of next actions by collecting habits and the first action of each fold
 function FindNextActions(date)
-  let tree = []
   let deadlines = []
   let habits = []
-  let actions = []
+  let goals = []
   let lnum = 0
-  let lastDepth = -1
   let bufnr = bufnr()
   let today = strftime("%Y%m%d", a:date - 60*60*4) " roll dates at 4am, not midnight
 
   for line in getline(1, '$')
     let lnum += 1
 
-    " parse each line
+    " parse each line (action : freq : date : duration)
     let splits = line->split(" : ")
-    let goal = "" | if splits->len() > 0 | let goal = splits[0]->trim() | endif
+    let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
     let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
     let duration = "" | if splits->len() > 3 | let duration = splits[3]->str2nr() | endif
 
-    " track goal hierarchy using a stack
-    let depth = indent(lnum) / 2
-    if depth <= lastDepth | call remove(tree, depth - 1, -1) | endif
-    call add(tree, goal)
-    if line != "" | let lastDepth = depth | endif
-
-    " collect deadlines
+    " collect deadlines: ! in frequency field, any date
     if freq == "!"
-      let text = printf("%s %s", date, goal)
+      let text = printf("%s %s", date, action)
       call add(deadlines, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'date': date })
     endif
 
-    " collect habits
+    " collect habits: date has been reached
     if date != "" && date <= today
-      let text = printf("%s %03d %s", date, duration, goal)
+      let text = printf("%s %03d %s", date, duration, action)
       call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'duration': duration })
     endif
 
-    " collect the first action of each goal
-    if line->match('^\s*>') > -1 && tree[-2] != ""
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': goal })
-      let tree[-2] = ""
+    " collect goals: number of tasks remaining or '>' in the frequency field
+    if freq->match('[0-9>]') > -1
+      let text = printf("%-35s %s", action, freq)
+      call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': text })
     endif
   endfor
 
@@ -150,7 +142,7 @@ function FindNextActions(date)
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
   call sort(deadlines, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
   call sort(habits, { x, y -> x.duration == y.duration ? 0 : x.duration > y.duration ? -1 : 1 })
-  call setqflist(separator + dateline + deadlines + separator + habits + separator + actions, 'r')
+  call setqflist(separator + dateline + deadlines + separator + habits + separator + goals, 'r')
   call DisplayQuickfixTab()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(localtime())
