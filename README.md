@@ -46,7 +46,7 @@ Habits are sorted longest first. As you complete them, you must update the repet
 
 **Goals** include a countdown field which is either the number of remaining tasks, or an `>` arrow, which means *in progress*. E.g.
 
-    watch the cities of gold : 19
+    find all the super mario world exits : 19
     conquer the world : >
 
 Of course, you can use whatever tags and symbols you like for any purpose and query for those entries using `:Filter` and `:Find`.
