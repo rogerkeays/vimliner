@@ -171,7 +171,7 @@ autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.
 function DisplayQuickfixWindow()
   vert copen
   set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
-  syn match metadata /^.*|[-0-9 col]\+| / transparent conceal
+  syn match metadata /^.*|[-0-9 col]\+|/ transparent conceal
   normal =
 endfunction
 autocmd FileType vimliner hi QuickFixLine ctermbg=None
