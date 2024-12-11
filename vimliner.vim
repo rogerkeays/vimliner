@@ -153,7 +153,7 @@ function FindNextActions(date)
   call sort(deadlines, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
   call sort(habits, { x, y -> x.duration == y.duration ? 0 : x.duration > y.duration ? -1 : 1 })
   call setqflist(separator + dateline + deadlines + separator + habits + separator + goals, 'r')
-  call DisplayQuickfixTab()
+  call DisplayQuickfixWindow()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(localtime())
 autocmd FileType vimliner command! Tomorrow call FindNextActions(localtime() + 24*60*60)
@@ -162,28 +162,17 @@ autocmd FileType vimliner command! Tomorrow call FindNextActions(localtime() + 2
 " if no regexp is supplied, the last search pattern is used
 function GrepOutlines(regexp, files)
   execute 'vimgrep /'.a:regexp.'/j '.a:files
-  call DisplayQuickfixTab()
+  call DisplayQuickfixWindow()
 endfunction
 autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
 autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
 
 " opens the quickfix list in a tab with no formatting
-function DisplayQuickfixTab()
-  if !exists("g:vimliner_copened")
-    $tab copen
-    set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
-    let g:vimliner_copened = 1
-
-    " switchbuf=newtab is ignored when there are no splits, so we use :tab explicitely
-    " https://vi.stackexchange.com/questions/6996
-    nnoremap <buffer> <Enter> :-tab .cc<CR>zx
-  else
-    $tabnext
-    normal 1G
-  endif
-
-  " hide the quickfix metadata
+function DisplayQuickfixWindow()
+  vert copen
+  set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
   syn match metadata /^.*|[-0-9 col]\+| / transparent conceal
+  normal =
 endfunction
 autocmd FileType vimliner hi QuickFixLine ctermbg=None
 
