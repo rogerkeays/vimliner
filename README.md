@@ -43,9 +43,11 @@ Since version 1.3, Vimliner includes the query functions below. The query result
     find all super mario world exits : 19
     conquer the world : >
 
-**Actions** are defined with a priority marker and two optional fields: frequency and date of next repetition. Priority is one of the following characters: `* + = - x` (where * is the highest priority). Additionally, a priority of `>` means **undecided**. The frequency is any text string and the date is `YYYYMMDD`.
+**Actions** are defined with a priority marker and two optional fields: frequency and date of next repetition. Priority is one of the following characters: `* + = - x` (where `*` is the highest priority). Additionally, a priority of `>` means **undecided**. The frequency is any text string and the date is `YYYYMMDD`.
 
      * cook real food : every day : 20241120
+
+As you complete actions, you must update the repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
 
 Of course, you can use whatever tags and symbols you like for any purpose and query for those entries using `:Filter` and `:Find`.
 
