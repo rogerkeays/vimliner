@@ -35,11 +35,11 @@
 " results are displayed in a quickfix list in a separate tab, and you can easily
 " jump to the matching lines by pressing `Enter`.
 "
+"  - `:Actions` show today's list of deadlines, goals and actions
+"  - `:Tomorrow` show tomorrow's list of deadlines, goals and actions
 "  - `:Filter regexp` displays lines matching `regexp` from the current file
 "  - `:Find regexp` displays lines matching `regexp` from all `.log` files in
 "                   the current directory
-"  - `:Actions` show today's list of deadlines, habits and goals
-"  - `:Tomorrow` show tomorrow's list of deadlines, habits and goals
 "
 " Deadlines are defined by adding a date preceded by an exclamation mark. The
 " date format should be `YYYYMMDD`. A semicolon is required with spacing to
@@ -47,14 +47,13 @@
 "
 "     release vimliner 1.3 : !20241120
 "
-" Habits are defined with three extra fields: frequency, date of next
-" repetition, and duration. The frequency is any text string; date is as above;
-" and the duration is a number in minutes. E.g.
+" Actions are defined with a priority marker and two optional fields: frequency
+" and date of next repetition. Priority is one of the following characters:
+" `* + = - x` (where * is the highest priority). Additionally, a priority of
+" `>` means **undecided**. The frequency is any text string and the date is
+" `YYYYMMDD`.  "
 "
-"     cook real food : every day : 20241120 : 45
-"
-" Habits are sorted longest first. As you complete them, you must update the
-" repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
+"     * cook real food : every day : 20241120
 "
 " Goals include a countdown field which is either the number of remaining tasks,
 " or an `>` arrow, which means *in progress*. E.g.
@@ -112,8 +111,8 @@ endfunction
 " build a list of next actions by collecting deadlines, habits and goals
 function FindNextActions(date)
   let deadlines = []
-  let habits = []
   let goals = []
+  let actions = []
   let lnum = 0
   let bufnr = bufnr()
   let today = strftime("%Y%m%d", a:date - 60*60*4) " roll dates at 4am, not midnight
@@ -134,16 +133,15 @@ function FindNextActions(date)
       call add(deadlines, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'date': date })
     endif
 
-    " collect habits: date has been reached
-    if date != "" && date <= today
-      let text = printf("%s %03d %s", date, duration, action)
-      call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'duration': duration })
-    endif
-
     " collect goals: number of tasks remaining or '>' in the frequency field
     if freq->match('[0-9>]') > -1
       let text = printf("%-35s %s", action, freq)
       call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': text })
+    endif
+
+    " collect actions: start with a priority marker and date has been reached
+    if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= today)
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
     endif
   endfor
 
@@ -151,12 +149,21 @@ function FindNextActions(date)
   let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': today.' TODAY' } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
   call sort(deadlines, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
-  call sort(habits, { x, y -> x.duration == y.duration ? 0 : x.duration > y.duration ? -1 : 1 })
-  call setqflist(separator + dateline + deadlines + separator + habits + separator + goals, 'r')
+  call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
+  call setqflist(separator + dateline + deadlines + separator + goals + separator + actions, 'r')
   call DisplayQuickfixWindow()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(localtime())
 autocmd FileType vimliner command! Tomorrow call FindNextActions(localtime() + 24*60*60)
+
+function GetPriority(action)
+  if a:action[0] == '*' | return 5
+  elseif a:action[0] == '+' | return 4
+  elseif a:action[0] == '=' | return 3
+  elseif a:action[0] == '-' | return 2
+  elseif a:action[0] == 'x' | return 1
+  else | return 0 | endif
+endfunction
 
 " filter the current file using a regexp and display the results in a separate tab
 " if no regexp is supplied, the last search pattern is used
@@ -188,4 +195,3 @@ autocmd FileType vimliner hi Good ctermbg=green ctermfg=black
 autocmd FileType vimliner hi Okay ctermbg=black ctermfg=253
 autocmd FileType vimliner hi Warning ctermbg=214 ctermfg=black
 autocmd FileType vimliner hi Critical ctermbg=red ctermfg=black
-
