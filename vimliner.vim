@@ -149,7 +149,7 @@ function FindNextActions(date)
   endfor
 
   " arrange and display as a quicklist
-  let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': today.' TODAY' } ]
+  let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': today } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
   call sort(deadlines, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
@@ -167,6 +167,17 @@ function GetPriority(action)
   elseif a:action[0] == 'x' | return 1
   else | return 0 | endif
 endfunction
+
+function MakeActionCards(dir)
+  let actions = getqflist()
+  let actionlist = []
+  let i = 0
+  for line in actions[4:]
+    call writefile([ line.text ], a:dir."/".printf("%04d", i).".txt")
+    let i = i + 1
+  endfor
+endfunction
+autocmd FileType vimliner command! -nargs=1 MakeActionCards call MakeActionCards(<f-args>)
 
 " filter the current file using a regexp and display the results in a separate tab
 " if no regexp is supplied, the last search pattern is used
