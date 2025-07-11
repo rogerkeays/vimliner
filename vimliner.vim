@@ -115,7 +115,7 @@ function FindNextActions(date)
 
     " collect actions: start with a priority marker and date has been reached
     if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= now)
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
     endif
   endfor
 
@@ -144,8 +144,8 @@ function MakeActionCards(dir)
   for line in actions[3:]
     let basename = printf("%04d", i)
 
-    " add the start time (stored in pattern field) to the card name if declared
-    if line.pattern->len() > 8 | let basename = basename . line.pattern[8:] | endif
+    " add the start time (stored in nr field) to the card name if declared
+    if line.nr > 0 | let basename = basename."_".line.nr | endif
     call writefile([ line.text ], a:dir."/".basename.".txt")
     let i = i + 1
   endfor
@@ -164,7 +164,7 @@ autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '
 function DisplayQuickfixWindow()
   vert copen
   set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
-  syn match metadata /^.*|[-0-9 col]\+|/ transparent conceal
+  syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
   normal =
 endfunction
 autocmd FileType vimliner hi QuickFixLine ctermbg=None
