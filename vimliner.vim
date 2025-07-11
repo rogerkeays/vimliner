@@ -57,9 +57,10 @@
 " and date of next repetition. Priority is one of the following characters:
 " `* + = - x` (where `*` is the highest priority). Additionally, a priority of
 " `>` means **undecided**. The frequency is any text string and the date is
-" `YYYYMMDD`.  "
+" `YYYYMMDD` or `YYYYMMDD_HHMM.  "
 "
-"     * cook real food : every day : 20241120
+"     * stretch : every day : 20241120
+"     * cook dinner : every day : 20241120_1900
 "
 " As you complete actions, you must update the repetition date by hand (`CTRL-A`
 " helps) and rerun the `:Actions` query.
