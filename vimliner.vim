@@ -118,7 +118,7 @@ function FindNextActions(date)
   let actions = []
   let lnum = 0
   let bufnr = bufnr()
-  let today = strftime("%Y%m%d", a:date - 60*60*4) " roll dates at 4am, not midnight
+  let today = strftime("%Y%m%d_%H%M", a:date)
 
   for line in getline(1, '$')
     let lnum += 1
@@ -144,7 +144,7 @@ function FindNextActions(date)
 
     " collect actions: start with a priority marker and date has been reached
     if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= today)
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'pattern': date })
     endif
   endfor
 
@@ -170,10 +170,13 @@ endfunction
 
 function MakeActionCards(dir)
   let actions = getqflist()
-  let actionlist = []
-  let i = 0
+  let i = 1
   for line in actions[4:]
-    call writefile([ line.text ], a:dir."/".printf("%04d", i).".txt")
+    let basename = printf("%04d", i)
+
+    " add the start time (stored in pattern field) to the card name if declared
+    if line.pattern->len() > 8 | let basename = basename . line.pattern[8:] | endif
+    call writefile([ line.text ], a:dir."/".basename.".txt")
     let i = i + 1
   endfor
 endfunction
