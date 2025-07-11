@@ -35,23 +35,9 @@
 " results are displayed in a quickfix list in a separate tab, and you can easily
 " jump to the matching lines by pressing `Enter`.
 "
-"  - `:Actions` show today's list of deadlines, goals and actions
-"  - `:Tomorrow` show tomorrow's list of deadlines, goals and actions
+"  - `:Actions` show today's list of actions
+"  - `:Tomorrow` show tomorrow's list of actions
 "  - `:Filter regexp` displays lines matching `regexp` from the current file
-"  - `:Find regexp` displays lines matching `regexp` from all `.log` files in
-"                   the current directory
-"
-" Deadlines are defined by adding a date preceded by an exclamation mark. The
-" date format should be `YYYYMMDD`. A semicolon is required with spacing to
-" separate the fields. E.g.
-"
-"     release vimliner 1.3 : !20241120
-"
-" Goals include a countdown field which is either the number of remaining tasks,
-" or an `>` arrow, which means *in progress*. E.g.
-"
-"     find all super mario world exits : 19
-"     conquer the world : >
 "
 " Actions are defined with a priority marker and two optional fields: frequency
 " and date of next repetition. Priority is one of the following characters:
@@ -66,7 +52,7 @@
 " helps) and rerun the `:Actions` query.
 "
 " Of course, you can use whatever tags and symbols you like for any purpose and
-" query for those entries using `:Filter` and `:Find`.
+" query for those entries using `:Filter`.
 "
 " News And Updates:
 "
@@ -112,49 +98,32 @@ function! VimlinerFold(lnum)
     endif
 endfunction
 
-" build a list of next actions by collecting deadlines, habits and goals
 function FindNextActions(date)
-  let deadlines = []
-  let goals = []
-  let actions = []
   let lnum = 0
   let bufnr = bufnr()
   let today = strftime("%Y%m%d_%H%M", a:date)
+  let actions = []
 
   for line in getline(1, '$')
     let lnum += 1
 
-    " parse each line (action : freq : date : duration)
+    " parse each line (action : freq : date)
     let splits = line->split(" : ")
     let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
     let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
-    let duration = "" | if splits->len() > 3 | let duration = splits[3]->str2nr() | endif
-
-    " collect deadlines: ! in frequency field, any date
-    if freq == "!"
-      let text = printf("%s %s", date, action)
-      call add(deadlines, { 'bufnr': bufnr, 'lnum': lnum, 'text': text, 'date': date })
-    endif
-
-    " collect goals: number of tasks remaining or '>' in the frequency field
-    if freq->match('[0-9>]') > -1
-      let text = printf("%-35s %s", action, freq)
-      call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': text })
-    endif
 
     " collect actions: start with a priority marker and date has been reached
     if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= today)
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'pattern': date })
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
     endif
   endfor
 
   " arrange and display as a quicklist
   let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': today } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
-  call sort(deadlines, { x, y -> x.date == y.date ? 0 : x.date > y.date ? 1 : -1 })
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call setqflist(separator + dateline + deadlines + separator + goals + separator + actions, 'r')
+  call setqflist(separator + dateline + separator + actions, 'r')
   call DisplayQuickfixWindow()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(localtime())
@@ -172,7 +141,7 @@ endfunction
 function MakeActionCards(dir)
   let actions = getqflist()
   let i = 1
-  for line in actions[4:]
+  for line in actions[3:]
     let basename = printf("%04d", i)
 
     " add the start time (stored in pattern field) to the card name if declared
@@ -190,7 +159,6 @@ function GrepOutlines(regexp, files)
   call DisplayQuickfixWindow()
 endfunction
 autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
-autocmd FileType vimliner command! -nargs=? Find call GrepOutlines(<f-args>, '*.out')
 
 " opens the quickfix list in a tab with no formatting
 function DisplayQuickfixWindow()
