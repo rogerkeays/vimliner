@@ -169,15 +169,3 @@ function DisplayQuickfixWindow()
 endfunction
 autocmd FileType vimliner hi QuickFixLine ctermbg=None
 
-" syntax highlighting for status indicators, note surrounding spaces are non-breaking
-autocmd BufRead *.out syn match Great ` ..\?\* `
-autocmd BufRead *.out syn match Good ` ..\?+ `
-autocmd BufRead *.out syn match Okay ` ..\?= `
-autocmd BufRead *.out syn match Warning ` ..\?- `
-autocmd BufRead *.out syn match Critical ` ..\?x `
-
-autocmd FileType vimliner hi Great ctermbg=yellow ctermfg=black
-autocmd FileType vimliner hi Good ctermbg=green ctermfg=black
-autocmd FileType vimliner hi Okay ctermbg=black ctermfg=253
-autocmd FileType vimliner hi Warning ctermbg=214 ctermfg=black
-autocmd FileType vimliner hi Critical ctermbg=red ctermfg=black
