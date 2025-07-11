@@ -98,10 +98,9 @@ function! VimlinerFold(lnum)
     endif
 endfunction
 
-function FindNextActions(date)
+function FindNextActions(now)
   let lnum = 0
   let bufnr = bufnr()
-  let now = strftime("%Y%m%d_%H%M", a:date)
   let actions = []
 
   for line in getline(1, '$')
@@ -114,20 +113,20 @@ function FindNextActions(date)
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= now)
+    if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= a:now)
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
     endif
   endfor
 
   " arrange and display as a quicklist
-  let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': now } ]
-  let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
+  let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now } ]
+  let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call setqflist(separator + dateline + separator + actions, 'r')
   call DisplayQuickfixWindow()
 endfunction
-autocmd FileType vimliner command! Actions call FindNextActions(localtime())
-autocmd FileType vimliner command! Tomorrow call FindNextActions(localtime() + 24*60*60)
+autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
+autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 24*60*60))
 
 function GetPriority(action)
   if a:action[0] == '*' | return 5
