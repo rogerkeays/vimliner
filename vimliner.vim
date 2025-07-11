@@ -35,7 +35,7 @@
 " results are displayed in a quickfix list in a separate tab, and you can easily
 " jump to the matching lines by pressing `Enter`.
 "
-"  - `:Actions` show today's list of actions
+"  - `:Actions` show current list of actions
 "  - `:Tomorrow` show tomorrow's list of actions
 "  - `:Filter regexp` displays lines matching `regexp` from the current file
 "
@@ -101,7 +101,7 @@ endfunction
 function FindNextActions(date)
   let lnum = 0
   let bufnr = bufnr()
-  let today = strftime("%Y%m%d_%H%M", a:date)
+  let now = strftime("%Y%m%d_%H%M", a:date)
   let actions = []
 
   for line in getline(1, '$')
@@ -114,13 +114,13 @@ function FindNextActions(date)
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= today)
+    if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= now)
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
     endif
   endfor
 
   " arrange and display as a quicklist
-  let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': today } ]
+  let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': now } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text':'' } ]
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call setqflist(separator + dateline + separator + actions, 'r')

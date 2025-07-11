@@ -29,7 +29,7 @@ Save your outliner files with a `.out` extension for vimliner to be autodetected
 
 Since version 1.3, Vimliner includes the query functions below. The query results are displayed in a quickfix list in a separate tab, and you can easily jump to the matching lines by pressing `Enter`.
 
- - `:Actions` show today's list of actions
+ - `:Actions` show current list of actions
  - `:Tomorrow` show tomorrow's list of actions
  - `:Filter regexp` displays lines matching `regexp` from the current file
 
