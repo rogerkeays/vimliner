@@ -114,19 +114,30 @@ function FindNextActions(now)
 
     " collect actions: start with a priority marker and date has been reached
     if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= a:now)
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'date': date, 'nr': date[9:] })
     endif
   endfor
 
   " arrange and display as a quicklist
   let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
+  call sort(actions, { x, y -> CompareActions(x, y) })
   call setqflist(separator + dateline + separator + actions, 'r')
   call DisplayQuickfixWindow()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
 autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 24*60*60))
+
+" sort actions by priority, then start time
+function CompareActions(x, y)
+  let result = GetPriority(a:y.text) - GetPriority(a:x.text)
+  if result == 0
+    let xstart = a:x.date[9:]
+    let ystart = a:y.date[9:]
+    let result = xstart == ystart ? 0 : xstart > ystart ? 1 : -1
+  endif
+  return result
+endfunction
 
 function GetPriority(action)
   if a:action[0] == '*' | return 5
