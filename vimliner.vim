@@ -112,8 +112,8 @@ function FindNextActions(now)
     let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
 
-    " if there is no time on action date use _0500
-    if date->len() == 8 | let date = date."_0500" | endif
+    " if there is no time on action date use _0400
+    if date->len() == 8 | let date = date."_0400" | endif
 
     " collect actions: start with a priority marker and date has been reached
     if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= a:now)
@@ -129,7 +129,7 @@ function FindNextActions(now)
   call DisplayQuickfixWindow()
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
-autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 24*60*60))
+autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 20*60*60)) " rollover a 4am
 
 function GetPriority(action)
   if a:action[0] == '*' | return 5
