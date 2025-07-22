@@ -112,6 +112,9 @@ function FindNextActions(now)
     let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
 
+    " if there is no time on action date use _0500
+    if date->len() == 8 | let date = date."_0500" | endif
+
     " collect actions: start with a priority marker and date has been reached
     if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= a:now)
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
