@@ -106,17 +106,15 @@ function FindNextActions(now)
   for line in getline(1, '$')
     let lnum += 1
 
-    " parse each line (action : freq : date)
+    " parse each line (action : freq : date_time)
     let splits = line->split(" : ")
     let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
     let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
-
-    " if there is no time on action date use _0400
-    if date->len() == 8 | let date = date."_0400" | endif
+    let time = "0400" | if date->len() > 8 | let time = date[9:] | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= a:now)
+    if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= a:now) && (time <= a:now[9:])
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
     endif
   endfor
