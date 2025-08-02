@@ -111,10 +111,11 @@ function FindNextActions(now)
     let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
     let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
-    let time = "0400" | if date->len() > 8 | let time = date[9:] | endif
+    let time = "" | if date->len() > 8 | let time = date[9:] | endif
+    if date->len() == 8 | let date = date."_0400" | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if action->match('^[-*+=x>] ') > -1 && (date == "" || date <= a:now) && (time <= a:now[9:])
+    if (action->match('^[-*+=x>] ') > -1) && (date <= a:now) && (time <= a:now[9:])
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
     endif
   endfor
