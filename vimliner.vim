@@ -82,20 +82,11 @@ autocmd FileType vimliner noremap <C-j> ddp
 autocmd FileType vimliner noremap <C-k> ddkP
 
 function! VimlinerFold(lnum)
-    if getline(a:lnum) =~? '^$'
-        return VimlinerFold(a:lnum - 1)
-    endif
-
-    let this_indent = IndentLevel(a:lnum)
-    let next_indent = IndentLevel(a:lnum + 1)
-
-    if next_indent == this_indent
-        return this_indent
-    elseif next_indent < this_indent
-        return this_indent
-    elseif next_indent > this_indent
-        return '>' . next_indent
-    endif
+    if getline(a:lnum)->len() == 0 | return "=" | endif
+    let current = IndentLevel(a:lnum)
+    let next = IndentLevel(a:lnum + 1)
+    if next > current | return '>' . next | endif
+    return current
 endfunction
 
 " allow priority markers in indent margin
