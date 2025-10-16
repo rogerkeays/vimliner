@@ -86,8 +86,8 @@ function! VimlinerFold(lnum)
         return VimlinerFold(a:lnum - 1)
     endif
 
-    let this_indent = indent(a:lnum) / &shiftwidth
-    let next_indent = indent(a:lnum + 1) / &shiftwidth
+    let this_indent = IndentLevel(a:lnum)
+    let next_indent = IndentLevel(a:lnum + 1)
 
     if next_indent == this_indent
         return this_indent
@@ -96,6 +96,13 @@ function! VimlinerFold(lnum)
     elseif next_indent > this_indent
         return '>' . next_indent
     endif
+endfunction
+
+" allow priority markers in indent margin
+function IndentLevel(lnum)
+    let spaces = indent(a:lnum)
+    if getline(a:lnum)[spaces:] =~ '^[-*+=x>] ' | let spaces += 2 | endif
+    return spaces / &shiftwidth
 endfunction
 
 function FindNextActions(now)
