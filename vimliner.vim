@@ -137,20 +137,6 @@ function GetPriority(action)
   else | return 0 | endif
 endfunction
 
-function MakeActionCards(dir)
-  let actions = getqflist()
-  let i = 1
-  for line in actions[3:]
-    let basename = printf("%04d", i)
-
-    " add the start time (stored in nr field) to the card name if declared
-    if line.nr > 0 | let basename = basename."_".line.nr | endif
-    call writefile([ line.text ], a:dir."/".basename.".txt")
-    let i = i + 1
-  endfor
-endfunction
-autocmd FileType vimliner command! -nargs=1 MakeActionCards call MakeActionCards(<f-args>)
-
 " filter the current file using a regexp and display the results in a separate tab
 " if no regexp is supplied, the last search pattern is used
 function GrepOutlines(regexp, files)
