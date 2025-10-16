@@ -31,9 +31,8 @@ Since version 1.3, Vimliner includes the query functions below. The query result
 
  - `:Actions` show current list of actions
  - `:Tomorrow` show tomorrow's list of actions
- - `:Filter regexp` displays lines matching `regexp` from the current file
 
-**Actions** are defined with a priority marker and two optional fields: frequency and date of next repetition. Priority is one of the following characters: `* + = - x` (where `*` is the highest priority). Additionally, a priority of `>` means **undecided**. The frequency is any text string and the date is `YYYYMMDD` or `YYYYMMDD_HHMM`.
+**Actions** are defined with a priority marker and two optional fields: frequency and date of next repetition. Priority is one of the following characters: `* + = - x` (where `*` is the highest priority). Additionally, a priority of `>` means **undecided**. The priority marker can appear in the indent margin to keep text aligned. The frequency is any text string and the date is `YYYYMMDD` or `YYYYMMDD_HHMM`.
 
      * stretch : every day : 20241120
      * cook dinner : every day : 20241120_1900
