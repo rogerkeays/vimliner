@@ -77,6 +77,7 @@ autocmd FileType vimliner set shiftwidth=2 expandtab autoindent
 autocmd FileType vimliner set linebreak breakindent showbreak=\|\ 
 
 autocmd FileType vimliner hi Folded ctermbg=NONE ctermfg=NONE
+autocmd FileType vimliner hi QuickFixLine ctermbg=None
 autocmd FileType vimliner nnoremap <TAB> za
 autocmd FileType vimliner noremap <C-j> ddp
 autocmd FileType vimliner noremap <C-k> ddkP
@@ -118,12 +119,17 @@ function FindNextActions(now)
     endif
   endfor
 
-  " arrange and display as a quicklist
+  " format and sort results
   let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call setqflist(separator + dateline + separator + actions, 'r')
-  call DisplayQuickfixWindow()
+
+  " display quickfix list
+  vert copen
+  set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
+  syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
+  normal =
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
 autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 20*60*60)) " rollover a 4am
@@ -136,21 +142,4 @@ function GetPriority(action)
   elseif a:action[0] == 'x' | return 1
   else | return 0 | endif
 endfunction
-
-" filter the current file using a regexp and display the results in a separate tab
-" if no regexp is supplied, the last search pattern is used
-function GrepOutlines(regexp, files)
-  execute 'vimgrep /'.a:regexp.'/j '.a:files
-  call DisplayQuickfixWindow()
-endfunction
-autocmd FileType vimliner command! -nargs=? Filter call GrepOutlines(<f-args>, '%')
-
-" opens the quickfix list in a tab with no formatting
-function DisplayQuickfixWindow()
-  vert copen
-  set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
-  syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
-  normal =
-endfunction
-autocmd FileType vimliner hi QuickFixLine ctermbg=None
 
