@@ -35,8 +35,9 @@
 " results are displayed in a quickfix list in a separate tab, and you can easily
 " jump to the matching lines by pressing `Enter`.
 "
-"  - `:Actions` show current list of actions
-"  - `:Tomorrow` show tomorrow's list of actions
+"  - `:Actions` show a list of current actions under the fold at the cursor
+"  - `:AllActions` show a list of all current actions
+"  - `:Tomorrow` show a list of all tomorrow's actions
 "
 " Actions are defined with a priority marker and two optional fields: frequency
 " and date of next repetition. Priority is one of the following characters:
@@ -98,13 +99,14 @@ function IndentLevel(lnum)
     return spaces / &shiftwidth
 endfunction
 
-function FindNextActions(now)
-  let lnum = 0
-  let bufnr = bufnr()
+function FindNextActions(now, mark="")
   let actions = []
-
-  for line in getline(1, '$')
-    let lnum += 1
+  let bufnr = bufnr()
+  let last = line('$')
+  let lnum = line(a:mark)
+  let line = getline(lnum)
+  let start_indent = IndentLevel(lnum)
+  while lnum <= last
 
     " parse each line (action : freq : date_time)
     let splits = line->split(" : ")
@@ -118,7 +120,14 @@ function FindNextActions(now)
     if (action->match('^[-*+=x>] ') > -1) && (date <= a:now) && (time <= a:now[9:])
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
     endif
-  endfor
+
+    " break if end of fold reached
+    let lnum += 1
+    let line = getline(lnum)
+    if a:mark->len() > 0 && line->len() > 0 && IndentLevel(lnum) <= start_indent
+      break
+    endif
+  endwhile
 
   " format and sort results
   let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now } ]
@@ -132,7 +141,8 @@ function FindNextActions(now)
   syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
   normal =
 endfunction
-autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
+autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()), ".")
+autocmd FileType vimliner command! AllActions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
 autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 20*60*60)) " rollover a 4am
 
 function GetPriority(action)
