@@ -35,9 +35,9 @@
 " results are displayed in a quickfix list in a separate tab, and you can easily
 " jump to the matching lines by pressing `Enter`.
 "
-"  - `:Actions` show a list of current actions under the fold at the cursor
-"  - `:AllActions` show a list of all current actions
+"  - `:Actions` show a list of all current actions
 "  - `:Tomorrow` show a list of all tomorrow's actions
+"  - `:SubActions` show a list of current actions under the fold at the cursor
 "
 " Actions are defined with a priority marker and two optional fields: frequency
 " and date of next repetition. Priority is one of the following characters:
@@ -141,9 +141,9 @@ function FindNextActions(now, mark="")
   syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
   normal =
 endfunction
-autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()), ".")
-autocmd FileType vimliner command! AllActions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
+autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
 autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 20*60*60)) " rollover a 4am
+autocmd FileType vimliner command! SubActions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()), ".")
 
 function GetPriority(action)
   if a:action[0] == '*' | return 5

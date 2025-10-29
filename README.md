@@ -29,9 +29,9 @@ Save your outliner files with a `.out` extension for vimliner to be autodetected
 
 Since version 1.3, Vimliner includes the query functions below. The query results are displayed in a quickfix list in a separate tab, and you can easily jump to the matching lines by pressing `Enter`.
 
- - `:Actions` show a list of current actions under the fold at the cursor
- - `:AllActions` show a list of all current actions
+ - `:Actions` show a list of all current actions
  - `:Tomorrow` show a list of all tomorrow's actions
+ - `:SubActions` show a list of current actions under the fold at the cursor
 
 **Actions** are defined with a priority marker and two optional fields: frequency and date of next repetition. Priority is one of the following characters: `* + = - x` (where `*` is the highest priority). Additionally, a priority of `>` means **undecided**. The priority marker can appear in the indent margin to keep text aligned. The frequency is any text string and the date is `YYYYMMDD` or `YYYYMMDD_HHMM`.
 
