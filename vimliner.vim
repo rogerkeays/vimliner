@@ -99,11 +99,11 @@ function IndentLevel(lnum)
     return spaces / &shiftwidth
 endfunction
 
-function FindNextActions(now, mark="")
+function FindNextActions(now, start_line=0)
   let actions = []
   let bufnr = bufnr()
   let last = line('$')
-  let lnum = line(a:mark)
+  let lnum = a:start_line
   let line = getline(lnum)
   let start_indent = IndentLevel(lnum)
   while lnum <= last
@@ -124,7 +124,7 @@ function FindNextActions(now, mark="")
     " break if end of fold reached
     let lnum += 1
     let line = getline(lnum)
-    if a:mark->len() > 0 && line->len() > 0 && IndentLevel(lnum) <= start_indent
+    if a:start_line > 0 && line->len() > 0 && IndentLevel(lnum) <= start_indent
       break
     endif
   endwhile
@@ -143,7 +143,7 @@ function FindNextActions(now, mark="")
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
 autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 20*60*60)) " rollover a 4am
-autocmd FileType vimliner command! SubActions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()), ".")
+autocmd FileType vimliner command! SubActions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()), line(".") + 1)
 
 function GetPriority(action)
   if a:action[0] == '*' | return 5
