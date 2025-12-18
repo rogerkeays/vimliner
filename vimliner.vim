@@ -118,11 +118,12 @@ function FindNextActions(now, start_line=0)
     if date->len() == 8 | let date = date."_0400" | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if (action->match('^[-*+=x] ') > -1) && (date <= a:now) && (time <= a:now[9:])
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
-    endif
-    if (action->match('^> ') > -1) && (date <= a:now) && (time <= a:now[9:])
-      call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
+    if (action->match('^[-*+=x>] ') > -1)
+      if (freq == "before")
+        call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': action.' '.freq.' '.date })
+      elseif (date <= a:now) && (time <= a:now[9:])
+        call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
+      endif
     endif
 
     " break if end of fold reached
@@ -136,6 +137,7 @@ function FindNextActions(now, start_line=0)
   " format and sort results
   let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
+  call sort(goals, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call setqflist(separator + dateline + separator + goals + separator + actions, 'r')
 
