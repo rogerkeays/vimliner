@@ -100,6 +100,7 @@ function IndentLevel(lnum)
 endfunction
 
 function FindNextActions(now, start_line=0)
+  let goals = []
   let actions = []
   let bufnr = bufnr()
   let last = line('$')
@@ -117,8 +118,11 @@ function FindNextActions(now, start_line=0)
     if date->len() == 8 | let date = date."_0400" | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if (action->match('^[-*+=x>] ') > -1) && (date <= a:now) && (time <= a:now[9:])
+    if (action->match('^[-*+=x] ') > -1) && (date <= a:now) && (time <= a:now[9:])
       call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
+    endif
+    if (action->match('^> ') > -1) && (date <= a:now) && (time <= a:now[9:])
+      call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
     endif
 
     " break if end of fold reached
@@ -133,7 +137,7 @@ function FindNextActions(now, start_line=0)
   let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call setqflist(separator + dateline + separator + actions, 'r')
+  call setqflist(separator + dateline + separator + goals + separator + actions, 'r')
 
   " display quickfix list
   vert copen
