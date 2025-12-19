@@ -120,7 +120,7 @@ function FindNextActions(now, start_line=0)
     " collect actions: start with a priority marker and date has been reached
     if (action->match('^[-*+=x>] ') > -1)
       if (freq == "before")
-        call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': action.' '.freq.' '.date })
+        call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%-40s before %s", action, date) })
       elseif (date <= a:now) && (time <= a:now[9:])
         call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
       endif
