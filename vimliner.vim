@@ -147,6 +147,7 @@ autocmd FileType vimliner command! SubActions call FindNextActions(strftime("%Y%
 
 function FindGoals()
   let goals = []
+  let deadlines = []
   let bufnr = bufnr()
   let lnum = 0
   for line in getline(1, '$')
@@ -159,16 +160,22 @@ function FindGoals()
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
 
     " collect goals
-    if (action->match('^[-*+=x>] ') > -1 && freq == "before")
-      call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%-40s before %s", action, date) })
+    if (action->match('^[-*+=x>] ') > -1)
+      if (freq == "before")
+        call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%-40s before %s", action, date) })
+      elseif (freq == "by")
+        call add(deadlines, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%s by %s", action, date) })
+      endif
     endif
   endfor
 
   " format and sort results
-  let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Goals' } ]
+  let heading1 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Goals' } ]
+  let heading2 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Deadlines' } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
   call sort(goals, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call setloclist(0, separator + heading + separator + goals + separator, 'r')
+  call sort(deadlines, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
+  call setloclist(0, separator + heading1 + separator + goals + separator + heading2 + separator + deadlines + separator, 'r')
 
   " display location list
   vert lopen
