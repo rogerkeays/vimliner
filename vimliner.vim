@@ -100,7 +100,6 @@ function IndentLevel(lnum)
 endfunction
 
 function FindNextActions(now, start_line=0)
-  let goals = []
   let actions = []
   let bufnr = bufnr()
   let last = line('$')
@@ -118,12 +117,8 @@ function FindNextActions(now, start_line=0)
     if date->len() == 8 | let date = date."_0400" | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if (action->match('^[-*+=x>] ') > -1)
-      if (freq == "before")
-        call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%-40s before %s", action, date) })
-      elseif (date <= a:now) && (time <= a:now[9:])
-        call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
-      endif
+    if (action->match('^[-*+=x>] ') > -1 && date <= a:now && time <= a:now[9:])
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
     endif
 
     " break if end of fold reached
@@ -135,11 +130,10 @@ function FindNextActions(now, start_line=0)
   endwhile
 
   " format and sort results
-  let dateline = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now } ]
+  let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions ('.a:now.')' } ]
   let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(goals, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call setqflist(separator + dateline + separator + goals + separator + actions, 'r')
+  call setqflist(separator + heading + separator + actions + separator, 'r')
 
   " display quickfix list
   vert copen
@@ -150,6 +144,39 @@ endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
 autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 20*60*60)) " rollover a 4am
 autocmd FileType vimliner command! SubActions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()), line("."))
+
+function FindGoals()
+  let goals = []
+  let bufnr = bufnr()
+  let lnum = 0
+  for line in getline(1, '$')
+    let lnum += 1
+
+    " parse each line (action : freq : date_time)
+    let splits = line->split(" : ")
+    let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
+    let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
+    let date = "" | if splits->len() > 2 | let date = splits[2] | endif
+
+    " collect goals
+    if (action->match('^[-*+=x>] ') > -1 && freq == "before")
+      call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%-40s before %s", action, date) })
+    endif
+  endfor
+
+  " format and sort results
+  let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Goals' } ]
+  let separator = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
+  call sort(goals, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
+  call setloclist(0, separator + heading + separator + goals + separator, 'r')
+
+  " display location list
+  vert lopen
+  set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
+  syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
+  normal =
+endfunction
+autocmd FileType vimliner command! Goals call FindGoals()
 
 function GetPriority(action)
   if a:action[0] == '*' | return 5
