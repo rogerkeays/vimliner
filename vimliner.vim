@@ -100,8 +100,6 @@ function IndentLevel(lnum)
 endfunction
 
 function FindNextActions(now, start_line=0)
-  let deadlines = []
-  let goals = []
   let actions = []
   let bufnr = bufnr()
   let last = line('$')
@@ -119,14 +117,8 @@ function FindNextActions(now, start_line=0)
     if date->len() == 8 | let date = date."_0400" | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if (action->match('^[-*+=x>] ') > -1)
-      if (freq == "by")
-        call add(deadlines, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%s by %s", action, splits[2]) })
-      elseif (freq == "before")
-        call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%-40s before %s", action, splits[2]) })
-      elseif (date <= a:now && time <= a:now[9:])
-        call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
-      endif
+    if (action->match('^[-*+=x>] ') > -1 && date <= a:now && time <= a:now[9:])
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
     endif
 
     " break if end of fold reached
@@ -138,14 +130,10 @@ function FindNextActions(now, start_line=0)
   endwhile
 
   " format and sort results
-  let heading1 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Deadlines' } ]
-  let heading2 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Goals' } ]
-  let heading3 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions ('.a:now.')' } ]
+  let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions ('.a:now.')' } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(deadlines, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call sort(goals, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call setqflist(sep + heading1 + sep + deadlines + sep + heading2 + sep + goals + sep + heading3 + sep + actions + sep, 'r')
+  call setqflist(sep + heading + sep + actions + sep, 'r')
 
   " display quickfix list
   vert copen
