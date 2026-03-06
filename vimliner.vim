@@ -101,7 +101,6 @@ endfunction
 
 function FindNextActions(now, start_line=0)
   let actions = []
-  let goals = []
   let bufnr = bufnr()
   let last = line('$')
   let lnum = a:start_line
@@ -118,12 +117,8 @@ function FindNextActions(now, start_line=0)
     if date->len() == 8 | let date = date."_0400" | endif
 
     " collect actions: start with a priority marker and date has been reached
-    if action->match('^[-*+=x>] ') > -1
-      if freq == 'before'
-        call add(goals, { 'bufnr': bufnr, 'lnum': lnum, 'text': printf("%-40s before %s", action, date), 'nr': date[9:] })
-      elseif date <= a:now && time <= a:now[9:]
-        call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
-      endif
+    if action->match('^[-*+=x>] ') > -1 && date <= a:now && time <= a:now[9:]
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
     endif
 
     " break if end of fold reached
@@ -135,12 +130,10 @@ function FindNextActions(now, start_line=0)
   endwhile
 
   " format and sort results
-  let heading1 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions ('.a:now.')' } ]
-  let heading2 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Goals' } ]
+  let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions ('.a:now.')' } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call sort(goals, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call setqflist(sep + heading1 + sep + actions + sep + heading2 + sep + goals + sep, 'r')
+  call setqflist(sep + heading + sep + actions + sep, 'r')
 
   " display quickfix list
   vert copen
