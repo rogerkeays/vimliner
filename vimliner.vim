@@ -101,6 +101,7 @@ endfunction
 
 function FindNextActions(now, start_line=0)
   let actions = []
+  let deadlines = []
   let bufnr = bufnr()
   let last = line('$')
   let lnum = a:start_line
@@ -113,12 +114,15 @@ function FindNextActions(now, start_line=0)
     let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
     let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
-    let time = "" | if date->len() > 8 | let time = date[9:] | endif
-    if date->len() == 8 | let date = date."_0400" | endif
+    let datetime = date | if datetime->len() == 8 | let datetime = datetime."_0400" | endif
 
-    " collect actions: start with a priority marker and date has been reached
-    if action->match('^[-*+=x>] ') > -1 && date <= a:now && time <= a:now[9:]
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action, 'nr': date[9:] })
+    " collect deadlines and actions: start with a priority marker and date has been reached
+    if action->match('^[-*+=x>] ') > -1
+      if freq == "by" || freq == "before"
+        call add(deadlines, { 'bufnr': bufnr, 'lnum': lnum, 'text': action." : ".freq." ".date, 'nr': date})
+      elseif datetime <= a:now
+        call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
+      endif
     endif
 
     " break if end of fold reached
@@ -130,10 +134,13 @@ function FindNextActions(now, start_line=0)
   endwhile
 
   " format and sort results
-  let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions ('.a:now.')' } ]
+  let heading1 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Deadlines' } ]
+  let heading2 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions' } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
+  call sort(deadlines, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
+  call sort(deadlines, { x, y -> y.nr < x.nr })
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
-  call setqflist(sep + heading + sep + actions + sep, 'r')
+  call setqflist(sep + heading1 + sep + deadlines + sep + heading2 + sep + actions + sep, 'r')
 
   " display quickfix list
   vert copen
