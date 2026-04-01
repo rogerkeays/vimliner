@@ -137,8 +137,8 @@ function FindNextActions(now, start_line=0)
   let heading1 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Deadlines' } ]
   let heading2 = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions' } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(deadlines, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call sort(deadlines, { x, y -> y.nr < x.nr })
+  call sort(deadlines, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call setqflist(sep + heading1 + sep + deadlines + sep + heading2 + sep + actions + sep, 'r')
 
