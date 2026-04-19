@@ -138,7 +138,7 @@ function FindNextActions(now, start_line=0)
   vert copen
   set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
   syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
-  normal =
+  normal =5<
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
 autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%d_2359", localtime() + 20*60*60)) " rollover a 4am
