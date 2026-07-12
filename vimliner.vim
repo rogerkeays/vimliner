@@ -39,15 +39,12 @@
 "  - `:Tomorrow` show a list of all tomorrow's actions
 "  - `:SubActions` show a list of current actions under the fold at the cursor
 "
-" Actions are defined with a priority marker and two optional fields: frequency
-" and date of next repetition. Priority is one of the following characters:
-" `* + = - x` (where `*` is the highest priority). Additionally, a priority of
-" `>` means **undecided**. The priority marker can appear in the indent margin
-" to keep text aligned. The frequency is any text string and the date is
-" `YYYYMMDD` or `YYYYMMDD_HHMM.  "
+" Actions are defined with a priority field and an optional date for the next
+" repetition. Priority is a number from 1 to 5, 1 being the highest priority.
+" The repetition date is `YYYYMMDD` or `YYYYMMDD_HHMM`. E.g.
 "
-"     * stretch : every day : 20241120
-"     * cook dinner : every day : 20241120_1900
+"     stretch every day : 1 : 20241120
+"     cook a hot meal every day : 1 : 20241120_1900
 "
 " As you complete actions, you must update the repetition date by hand (`CTRL-A`
 " helps) and rerun the `:Actions` query.
@@ -94,9 +91,7 @@ endfunction
 
 " allow priority markers in indent margin
 function IndentLevel(lnum)
-    let spaces = indent(a:lnum)
-    if getline(a:lnum)[spaces:] =~ '^[-*+=x>] ' | let spaces += 2 | endif
-    return spaces / &shiftwidth
+    return indent(a:lnum) / &shiftwidth
 endfunction
 
 function FindNextActions(now, start_line=0)
@@ -108,16 +103,16 @@ function FindNextActions(now, start_line=0)
   let start_indent = IndentLevel(lnum)
   while lnum <= last
 
-    " parse each line (action : freq : date_time)
+    " parse each line (action : priority : date_time)
     let splits = line->split(" : ")
     let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
-    let freq = "" | if splits->len() > 1 | let freq = splits[1] | endif
+    let priority = "" | if splits->len() > 1 | let priority = splits[1] | endif
     let date = "" | if splits->len() > 2 | let date = splits[2] | endif
     let datetime = date | if datetime->len() == 8 | let datetime = datetime."_0400" | endif
 
     " collect deadlines and actions: start with a priority marker and date has been reached
-    if action->match('^[-*+=x>] ') > -1 && datetime <= a:now
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': action })
+    if priority != "" && datetime <= a:now
+      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': "[".priority."] ".action })
     endif
 
     " break if end of fold reached
@@ -131,7 +126,7 @@ function FindNextActions(now, start_line=0)
   " format and sort results
   let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions' } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
+  call sort(actions, { x, y -> y.text[1] < x.text[1] })
   call setqflist(sep + heading + sep + actions + sep, 'r')
 
   " display quickfix list
@@ -152,4 +147,3 @@ function GetPriority(action)
   elseif a:action[0] == 'x' | return 1
   else | return 0 | endif
 endfunction
-
