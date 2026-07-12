@@ -40,11 +40,12 @@
 "  - `:SubActions` show a list of current actions under the fold at the cursor
 "
 " Actions are defined with a priority field and an optional date for the next
-" repetition. Priority is a number from 1 to 5, 1 being the highest priority.
-" The repetition date is `YYYYMMDD` or `YYYYMMDD_HHMM`. E.g.
+" repetition. Priority is one of the following characters: `* + = - x` (where
+" `*` is the highest priority). The repetition date is `YYYYMMDD` or
+" `YYYYMMDD_HHMM`. E.g.
 "
-"     stretch every day : 1 : 20241120
-"     cook a hot meal every day : 1 : 20241120_1900
+"     stretch every day : * : 20241120
+"     cook a hot meal every day : * : 20241120_1900
 "
 " As you complete actions, you must update the repetition date by hand (`CTRL-A`
 " helps) and rerun the `:Actions` query.
@@ -126,7 +127,7 @@ function FindNextActions(now, start_line=0)
   " format and sort results
   let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions' } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(actions, { x, y -> y.text[1] < x.text[1] })
+  call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
   call setqflist(sep + heading + sep + actions + sep, 'r')
 
   " display quickfix list
@@ -140,10 +141,10 @@ autocmd FileType vimliner command! Tomorrow call FindNextActions(strftime("%Y%m%
 autocmd FileType vimliner command! SubActions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()), line("."))
 
 function GetPriority(action)
-  if a:action[0] == '*' | return 5
-  elseif a:action[0] == '+' | return 4
-  elseif a:action[0] == '=' | return 3
-  elseif a:action[0] == '-' | return 2
-  elseif a:action[0] == 'x' | return 1
+  if a:action[1] == '*' | return 5
+  elseif a:action[1] == '+' | return 4
+  elseif a:action[1] == '=' | return 3
+  elseif a:action[1] == '-' | return 2
+  elseif a:action[1] == 'x' | return 1
   else | return 0 | endif
 endfunction
