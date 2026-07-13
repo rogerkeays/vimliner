@@ -33,10 +33,14 @@ Since version 1.3, Vimliner includes the query functions below. The query result
  - `:Tomorrow` show a list of all tomorrow's actions
  - `:SubActions` show a list of current actions under the fold at the cursor
 
-**Actions** are defined with a priority field and an optional date for the next repetition. Priority is one of the following characters: `* + = - x` (where `*` is the highest priority). The repetition date is `YYYYMMDD` or `YYYYMMDD_HHMM`. E.g.
+**Actions** are defined with additional priority field separated by a semicolon, where the priority is a number from 1-5, the highest priority being 1. E.g.
 
-     stretch every day : * : 20241120
-     cook a hot meal every day : * : 20241120_1900
+    release vimliner : 2
+
+Repeating actions include frequency and next repetition fields before the priority. The repetition date is `YYYYMMDD` or `YYYYMMDD_HHMM`. E.g.
+
+    stretch : every day : 20241120 : 1
+    cook a hot meal : every day : 20241120_1900 : 1
 
 As you complete actions, you must update the repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
 

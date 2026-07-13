@@ -39,13 +39,16 @@
 "  - `:Tomorrow` show a list of all tomorrow's actions
 "  - `:SubActions` show a list of current actions under the fold at the cursor
 "
-" Actions are defined with a priority field and an optional date for the next
-" repetition. Priority is one of the following characters: `* + = - x` (where
-" `*` is the highest priority). The repetition date is `YYYYMMDD` or
-" `YYYYMMDD_HHMM`. E.g.
+" Actions are defined with additional priority field separated by a semicolon,
+" where the priority is a number from 1-5, the highest priority being 1. E.g.
 "
-"     stretch every day : * : 20241120
-"     cook a hot meal every day : * : 20241120_1900
+"     release vimliner : 2
+"
+" Repeating actions include frequency and next repetition fields before the
+" priority. The repetition date is `YYYYMMDD` or `YYYYMMDD_HHMM`. E.g.
+"
+"     stretch : every day : 20241120 : 1
+"     cook a hot meal : every day : 20241120_1900 : 1
 "
 " As you complete actions, you must update the repetition date by hand (`CTRL-A`
 " helps) and rerun the `:Actions` query.
@@ -104,11 +107,11 @@ function FindNextActions(now, start_line=0)
   let start_indent = IndentLevel(lnum)
   while lnum <= last
 
-    " parse each line (action : priority : date_time)
+    " parse each line
     let splits = line->split(" : ")
     let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
-    let priority = "" | if splits->len() > 1 | let priority = splits[1] | endif
-    let date = "" | if splits->len() > 2 | let date = splits[2] | endif
+    let priority = "" | if splits->len() > 1 | let priority = splits[-1] | endif
+    let date = "" | if splits->len() > 2 | let date = splits[-2] | endif
     let datetime = date | if datetime->len() == 8 | let datetime = datetime."_0400" | endif
 
     " collect deadlines and actions: start with a priority marker and date has been reached
@@ -127,7 +130,7 @@ function FindNextActions(now, start_line=0)
   " format and sort results
   let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions' } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(actions, { x, y -> GetPriority(y.text) - GetPriority(x.text) })
+  call sort(actions, { x, y -> y.text[1] < x.text[1] })
   call setqflist(sep + heading + sep + actions + sep, 'r')
 
   " display quickfix list
