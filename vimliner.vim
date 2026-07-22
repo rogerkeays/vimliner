@@ -39,19 +39,25 @@
 "  - `:Tomorrow` show a list of all tomorrow's actions
 "  - `:SubActions` show a list of current actions under the fold at the cursor
 "
-" Actions are defined with additional priority field separated by a semicolon,
-" where the priority is a number from 1-5, the highest priority being 1. E.g.
+" The Action list is sorted by priority and duration (longest first).
+"
+" Actions are defined with additional metadata separated by a colon. The format
+" is `priority.[duration].[date]`, where priority is a number from 1-5 (the
+" highest priority being 1), the duration is a time in minutes, and the date is
+" `YYYYMMDD` or `YYYYMMDD_HHMM`. E.g.
 "
 "     release vimliner : 2
+"     release vimliner : 2.120
+"     release vimliner : 2.120.20260723
 "
-" Repeating actions include frequency and next repetition fields before the
-" priority. The repetition date is `YYYYMMDD` or `YYYYMMDD_HHMM`. E.g.
+" Repeating actions can a frequency as a separate field before the priority. This
+" field is not read by vimliner, but it is useful for planning.
 "
-"     stretch : every day : 20241120 : 1
-"     cook a hot meal : every day : 20241120_1900 : 1
+"     stretch : every day : 1.15.20241120
+"     cook a hot meal : every day : 1.45.20241120_1900
 "
-" As you complete actions, you must update the repetition date by hand (`CTRL-A`
-" helps) and rerun the `:Actions` query.
+" As you complete actions, you must update the next repetition date by hand
+" (`CTRL-A` helps) and rerun the `:Actions` query.
 "
 " Of course, you can use whatever tags and symbols you like for any purpose and
 " query for those entries using `:Filter`.
@@ -83,6 +89,8 @@ autocmd FileType vimliner hi QuickFixLine ctermbg=None
 autocmd FileType vimliner nnoremap <TAB> za
 autocmd FileType vimliner noremap <C-j> ddp
 autocmd FileType vimliner noremap <C-k> ddkP
+autocmd FileType vimliner noremap <C-a> $<C-a>
+autocmd FileType vimliner noremap <C-x> $<C-x>
 
 " open a new fold when the indent level increases
 function! VimlinerFold(lnum)
@@ -108,15 +116,19 @@ function FindNextActions(now, start_line=0)
   while lnum <= last
 
     " parse each line
-    let splits = line->split(" : ")
-    let action = "" | if splits->len() > 0 | let action = splits[0]->trim() | endif
-    let priority = "" | if splits->len() > 1 | let priority = splits[-1] | endif
-    let date = "" | if splits->len() > 2 | let date = splits[-2] | endif
-    let datetime = date | if datetime->len() == 8 | let datetime = datetime."_0400" | endif
+    if line->stridx(" : ") > 0
+      let fields = line->split(" : ")
+      let action = fields[0]->trim()
+      let metadata = fields[-1]->split("\\.")
+      let priority = metadata[0]
+      let duration = metadata->len() > 1 ? printf("%03d", metadata[1]) : "000"
+      let date = metadata->len() > 2 ? metadata[2] : ""
+      let datetime = date->len() == 8 ? date."_0400" : date
 
-    " collect deadlines and actions: start with a priority marker and date has been reached
-    if priority != "" && datetime <= a:now
-      call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': "[".priority."] ".action })
+      " collect deadlines and actions: start with a priority marker and date has been reached
+      if priority != "" && datetime <= a:now
+        call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': "[".priority." ".duration."] ".action })
+      endif
     endif
 
     " break if end of fold reached
@@ -130,7 +142,7 @@ function FindNextActions(now, start_line=0)
   " format and sort results
   let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': 'Actions' } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(actions, { x, y -> y.text[1] < x.text[1] })
+  call sort(actions, { x, y -> y.text[1] == x.text[1] ? y.text[3:5] > x.text[3:5] : y.text[1] < x.text[1] })
   call setqflist(sep + heading + sep + actions + sep, 'r')
 
   " display quickfix list
