@@ -48,8 +48,6 @@ Repeating actions can a frequency as a separate field before the priority. This 
 
 As you complete actions, you must update the next repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
 
-Of course, you can use whatever tags and symbols you like for any purpose and query for those entries using `:Filter` and `:Find`.
-
 ## News And Updates
 
  - https://rogerkeays.com/vimliner
