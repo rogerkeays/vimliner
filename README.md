@@ -41,12 +41,12 @@ Actions are defined with additional metadata separated by a colon. The format is
     release vimliner : 2.120
     release vimliner : 2.120.20260723
 
-Repeating actions can a frequency as a separate field before the priority. This field is not read by vimliner, but it is useful for planning.
+Habits (repeating actions) can be defined by placing the frequency in brackets after the action. This value is not read by vimliner, but is used for syntax highlighting and is useful for planning.
 
-    stretch : every day : 1.15.20241120
-    cook a hot meal : every day : 1.45.20241120_1900
+    stretch (every day) : 1.15.20241120
+    cook a hot meal (every day) : 1.45.20241120_1900
 
-As you complete actions, you must update the next repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
+As you complete habits, you must update the next repetition date by hand (`CTRL-A` helps) and rerun the `:Actions` query.
 
 ## News And Updates
 

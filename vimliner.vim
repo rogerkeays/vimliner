@@ -50,13 +50,14 @@
 "     release vimliner : 2.120
 "     release vimliner : 2.120.20260723
 "
-" Repeating actions can a frequency as a separate field before the priority. This
-" field is not read by vimliner, but it is useful for planning.
+" Habits (repeating actions) can be defined by placing the frequency in 
+" brackets after the action. This value is not read by vimliner, but is used 
+" for syntax highlighting and is useful for planning.
 "
-"     stretch : every day : 1.15.20241120
-"     cook a hot meal : every day : 1.45.20241120_1900
+"     stretch (every day) : 1.15.20241120
+"     cook a hot meal (every day) : 1.45.20241120_1900
 "
-" As you complete actions, you must update the next repetition date by hand
+" As you complete habits, you must update the next repetition date by hand
 " (`CTRL-A` helps) and rerun the `:Actions` query.
 "
 " News And Updates:
@@ -104,7 +105,6 @@ function IndentLevel(lnum)
 endfunction
 
 function FindNextActions(now, start_line=0)
-  let habits = []
   let actions = []
   let bufnr = bufnr()
   let last = line('$')
@@ -125,12 +125,7 @@ function FindNextActions(now, start_line=0)
 
       " collect deadlines and actions: start with a priority marker and date has been reached
       if priority != "" && datetime <= a:now
-        let text =  "[".priority." ".duration."] ".action
-        if fields->len() > 2
-          call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': text })
-        else
-          call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': text })
-        endif
+        call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': "[".priority." ".duration."] ".action })
       endif
     endif
 
@@ -145,14 +140,15 @@ function FindNextActions(now, start_line=0)
   " format and sort results
   let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now[0:7] } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
-  call sort(habits, { x, y -> y.text[1] == x.text[1] ? y.text[3:5] > x.text[3:5] : y.text[1] < x.text[1] })
   call sort(actions, { x, y -> y.text[1] == x.text[1] ? y.text[3:5] > x.text[3:5] : y.text[1] < x.text[1] })
-  call setqflist(sep + heading + sep + habits + sep + actions + sep, 'r')
+  call setqflist(sep + heading + sep + actions + sep, 'r')
 
   " display quickfix list
   vert copen
   set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
   syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
+  syn match frequency /(.\{-})/
+  hi frequency ctermfg=white
   normal =7<
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
