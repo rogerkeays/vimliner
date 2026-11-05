@@ -138,7 +138,7 @@ function FindNextActions(now, start_line=0)
   endwhile
 
   " format and sort results
-  let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now[0:7] } ]
+  let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': "Actions (".a:now[0:7].")" } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
   call sort(actions, { x, y -> y.text[1] == x.text[1] ? y.text[3:5] > x.text[3:5] : y.text[1] < x.text[1] })
   call setqflist(sep + heading + sep + actions + sep, 'r')
