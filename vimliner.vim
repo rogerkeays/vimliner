@@ -104,6 +104,7 @@ function IndentLevel(lnum)
 endfunction
 
 function FindNextActions(now, start_line=0)
+  let habits = []
   let actions = []
   let bufnr = bufnr()
   let last = line('$')
@@ -124,7 +125,12 @@ function FindNextActions(now, start_line=0)
 
       " collect deadlines and actions: start with a priority marker and date has been reached
       if priority != "" && datetime <= a:now
-        call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': "[".priority." ".duration."] ".action })
+        let text =  "[".priority." ".duration."] ".action
+        if fields->len() > 2
+          call add(habits, { 'bufnr': bufnr, 'lnum': lnum, 'text': text })
+        else
+          call add(actions, { 'bufnr': bufnr, 'lnum': lnum, 'text': text })
+        endif
       endif
     endif
 
@@ -139,8 +145,9 @@ function FindNextActions(now, start_line=0)
   " format and sort results
   let heading = [ { 'bufnr': bufnr, 'lnum': 1, 'text': a:now[0:7] } ]
   let sep = [ { 'bufnr': bufnr, 'lnum': 1, 'text': '' } ]
+  call sort(habits, { x, y -> y.text[1] == x.text[1] ? y.text[3:5] > x.text[3:5] : y.text[1] < x.text[1] })
   call sort(actions, { x, y -> y.text[1] == x.text[1] ? y.text[3:5] > x.text[3:5] : y.text[1] < x.text[1] })
-  call setqflist(sep + heading + sep + actions + sep, 'r')
+  call setqflist(sep + heading + sep + habits + sep + actions + sep, 'r')
 
   " display quickfix list
   vert copen
