@@ -148,7 +148,7 @@ function FindNextActions(now, start_line=0)
   set switchbuf+=usetab nowrap conceallevel=2 concealcursor=nc
   syn match metadata /^.*|[-0-9 col error]\+|/ transparent conceal
   syn match frequency /(.\{-})/
-  hi frequency ctermfg=white
+  hi frequency ctermfg=darkgrey
   normal =7<
 endfunction
 autocmd FileType vimliner command! Actions call FindNextActions(strftime("%Y%m%d_%H%M", localtime()))
